@@ -1,0 +1,13 @@
+{
+  "name": "Cookie POP",
+  "short_name": "Cookie POP",
+  "description": "Mini cookie balls & chocolate dip — Dip. Bite. Repeat.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#FAD0A9",
+  "theme_color": "#FAD0A9",
+  "icons": [
+    { "src": "assets/brand/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/brand/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

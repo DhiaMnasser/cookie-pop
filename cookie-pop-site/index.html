@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Cookie POP – Mini cookie balls &amp; chocolate dip | Tunisie</title>
+  <meta name="description" content="Cookie POP : mini boules de cookie faites maison en Tunisie, servies dans un gobelet transparent avec chocolat au lait et chocolat blanc à tremper. Dip. Bite. Repeat.">
+  <meta name="theme-color" content="#F7D3B7">
+  <link rel="canonical" href="[SITE_URL]/">
+
+  <!-- Open Graph / social -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Cookie POP">
+  <meta property="og:title" content="Cookie POP – Mini cookie balls &amp; chocolate dip | Tunisie">
+  <meta property="og:description" content="Mini boules de cookie faites maison + double dip chocolat au lait et chocolat blanc. Dip. Bite. Repeat.">
+  <meta property="og:url" content="[SITE_URL]/">
+  <meta property="og:image" content="[SITE_URL]/assets/brand/og-image-1200x630.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Gobelet Cookie POP rempli de mini cookies avec double dip chocolat">
+  <meta property="og:locale" content="fr_TN">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="og:locale:alternate" content="ar_TN">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="[SITE_URL]/assets/brand/og-image-1200x630.jpg">
+
+  <!-- Icons -->
+  <link rel="icon" href="assets/brand/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/brand/favicon-32.png">
+  <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+
+  <link rel="preload" as="image" href="assets/poster/hero-plate.webp" type="image/webp" fetchpriority="high">
+
+  <!-- Fonts: Fraunces (soft display serif) · Nunito (rounded text) · Kalam (hand notes, like the posters) · Baloo Bhaijaan 2 + IBM Plex Sans Arabic -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,500..800,100,1;1,9..144,500..700,100,1&family=Nunito:wght@400;600;700;800;900&family=Kalam:wght@700&family=Baloo+Bhaijaan+2:wght@500;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
+
+  <link rel="stylesheet" href="css/styles.css?v=76">
+
+  <script>
+    /* Motion gate before first paint; main.js removes .js-anim if GSAP fails to load. */
+    (function (d) {
+      d.classList.add('js');
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) d.classList.add('js-anim');
+      try {
+        var p = new URLSearchParams(location.search).get('lang') || localStorage.getItem('cp-lang');
+        if (p === 'ar') { d.lang = 'ar'; d.dir = 'rtl'; } else if (p === 'en') { d.lang = 'en'; }
+      } catch (e) {}
+    })(document.documentElement);
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Bakery",
+    "name": "Cookie POP",
+    "slogan": "Dip. Bite. Repeat.",
+    "description": "Mini boules de cookie faites maison avec double dip chocolat au lait et chocolat blanc.",
+    "image": "[SITE_URL]/assets/brand/og-image-1200x630.jpg",
+    "logo": "[SITE_URL]/assets/brand/icon-512.png",
+    "url": "[SITE_URL]/",
+    "address": { "@type": "PostalAddress", "addressCountry": "TN" }
+  }
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js" defer></script>
+  <script src="js/main.js?v=77" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main" data-i18n="a11y.skip">Aller au contenu</a>
+
+  <!-- HEADER: a floating pill -->
+  <header class="site-header" id="site-header">
+    <div class="header-bar">
+      <a class="brand" href="#hero" data-i18n-attr="aria-label:a11y.home" aria-label="Cookie POP – accueil">
+        <img src="assets/brand/logo-header.webp" width="260" height="194" alt="Cookie POP">
+      </a>
+
+      <nav class="nav" id="site-nav" data-i18n-attr="aria-label:a11y.nav" aria-label="Navigation principale">
+        <ul class="nav-links">
+          <li><a href="#making" data-i18n="nav.making">La fabrication</a></li>
+          <li><a href="#sizes" data-i18n="nav.sizes">Formats</a></li>
+          <li><a href="#flavours" data-i18n="nav.flavours">Saveurs</a></li>
+          <li><a href="#dips" data-i18n="nav.dips">Dips</a></li>
+          <li><a href="#order" data-i18n="nav.find">Nous trouver</a></li>
+        </ul>
+        <div class="lang" role="group" data-i18n-attr="aria-label:a11y.lang" aria-label="Langue">
+          <button type="button" class="lang-btn" data-lang="fr" lang="fr" aria-pressed="true">FR</button>
+          <button type="button" class="lang-btn" data-lang="en" lang="en" aria-pressed="false">EN</button>
+          <button type="button" class="lang-btn" data-lang="ar" lang="ar" aria-pressed="false">عربي</button>
+        </div>
+      </nav>
+
+      <div class="header-actions">
+        <a class="btn btn-choc btn-sm" href="#order"><span data-i18n="nav.order">Commander</span></a>
+        <button type="button" class="menu-btn" aria-expanded="false" aria-controls="site-nav" data-i18n-attr="aria-label:a11y.menu" aria-label="Ouvrir le menu">
+          <span class="menu-icon" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- HERO: the poster scene, with the cup turning on it -->
+    <section class="hero" id="hero" aria-labelledby="hero-title">
+      <div class="hero-scene">
+        <picture class="hero-plate" aria-hidden="true">
+          <source srcset="assets/poster/hero-plate.webp" type="image/webp">
+          <img src="assets/poster/hero-plate.jpg" width="1376" height="768" alt="" fetchpriority="high" decoding="async">
+        </picture>
+
+        <div class="hero-copy">
+          <p class="pill" data-hero data-i18n="hero.label">Mini boules de cookie × double dip</p>
+          <h1 class="display hero-title" id="hero-title" data-split data-i18n="hero.title">Fait pour <br>tremper.</h1>
+          <p class="script hero-script" data-hero aria-hidden="true" dir="ltr">Dip. Bite. Repeat.
+            <svg class="swoosh" viewBox="0 0 300 24" preserveAspectRatio="none"><path d="M4,16 C70,4 160,4 296,12" /></svg>
+          </p>
+          <p class="lead" data-hero data-i18n="hero.text">Des mini boules de cookie, façonnées à la main en petites fournées et scellées dans un gobelet transparent avec du chocolat au lait et du chocolat blanc à tremper.</p>
+          <div class="btn-row" data-hero>
+            <a class="btn btn-choc" href="#order">
+              <span data-i18n="hero.cta1">Commander</span>
+              <svg class="btn-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+            <a class="btn btn-ghost" href="#making"><span data-i18n="hero.cta2">Voir la fabrication</span></a>
+          </div>
+        </div>
+
+        <div class="hero-cup" data-depth="0.25">
+          <div class="cup-turn">
+            <picture>
+              <source srcset="assets/transparent/hero/hero-cup.webp?v=3" type="image/webp">
+              <img src="assets/transparent/hero/hero-cup.png?v=3" width="604" height="1000" decoding="async"
+                   data-i18n-attr="alt:alt.hero"
+                   alt="Gobelet transparent Cookie POP rempli de mini boules de cookie dorées et cacao, avec chocolat au lait et chocolat blanc sous un couvercle dôme">
+            </picture>
+            <span class="cup-shine" aria-hidden="true"></span>
+          </div>
+        </div>
+
+        <div class="hero-front" aria-hidden="true">
+          <img class="hf hf-1" src="assets/transparent/seq/p-golden-2.webp" alt="" width="200" height="200">
+          <img class="hf hf-2" src="assets/transparent/seq/p-cacao-3.webp" alt="" width="200" height="200">
+        </div>
+
+        <p class="note note--dip" aria-hidden="true">
+          <span data-i18n="note.dip">Double dip chocolat</span>
+          <svg viewBox="0 0 120 80"><path class="draw" d="M112,12 C80,8 46,24 20,58"/><path class="draw" d="M34,58 L19,62 L20,46"/></svg>
+        </p>
+      </div>
+
+      <ul class="feats wrap">
+        <li class="feat" data-hero>
+          <span class="feat-badge"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="17"/><path d="M17 27c2 2.8 4.4 4.2 7 4.2s5-1.4 7-4.2"/><circle class="dot" cx="18.5" cy="20" r="1.8"/><circle class="dot" cx="29.5" cy="20" r="1.8"/></svg></span>
+          <span data-i18n="feat.1">Petites bouchées</span>
+        </li>
+        <li class="feat" data-hero>
+          <span class="feat-badge"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 37S10 28.6 10 19c0-4.6 3.5-8 7.7-8 2.8 0 4.9 1.5 6.3 3.8 1.4-2.3 3.5-3.8 6.3-3.8 4.2 0 7.7 3.4 7.7 8 0 9.6-14 18-14 18z"/></svg></span>
+          <span data-i18n="feat.2">Grand bonheur</span>
+        </li>
+        <li class="feat" data-hero>
+          <span class="feat-badge"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M12 36C12 21 22 12 37 11c0 15-8.5 24.5-22.5 24.5"/><path d="M12 36c5-7.5 11-12.5 17.5-16"/></svg></span>
+          <span data-i18n="feat.3">Qualité premium</span>
+        </li>
+      </ul>
+    </section>
+
+    <!-- NUMBERS (brand facts only, never recipe measurements) -->
+    <section class="numbers" aria-label="Cookie POP en chiffres">
+      <ul class="wrap numbers-row">
+        <li class="num" data-reveal><span class="num-val" data-count="2" data-pad="2">02</span><span class="num-label" data-i18n="num.1">chocolats à tremper</span></li>
+        <li class="num" data-reveal><span class="num-val" data-count="3" data-pad="2">03</span><span class="num-label" data-i18n="num.2">formats de gobelet</span></li>
+        <li class="num" data-reveal><span class="num-val" data-count="4" data-pad="2">04</span><span class="num-label" data-i18n="num.4">saveurs : classique, cacao, fraise, pistache</span></li>
+        <li class="num" data-reveal><span class="num-val" data-count="100" data-suffix="%">100%</span><span class="num-label" data-i18n="num.3">fait à la main</span></li>
+      </ul>
+    </section>
+
+    <!-- THE MAKING — one pinned scroll story -->
+    <section class="making" id="making" aria-labelledby="making-title">
+      <div class="making-intro wrap">
+        <p class="pill" data-reveal data-i18n="making.label">La fabrication</p>
+        <h2 class="display" id="making-title" data-split data-i18n="making.title">Du bol <br>au gobelet.</h2>
+        <p class="script making-hint" data-reveal data-i18n="making.hint">Fais défiler, on le prépare devant toi</p>
+      </div>
+
+      <div class="story-track">
+        <div class="story-pin">
+          <ol class="panels">
+            <li class="panel" id="ch-1" data-tone="cream">
+              <div class="panel-copy">
+                <p class="step-kicker"><span class="step-n">01</span><span class="chapter-name" data-i18n="ch1.name">Le bol</span></p>
+                <h3 class="panel-title" data-split data-i18n="ch1.title">Tout commence ici</h3>
+                <p class="panel-text" data-i18n="ch1.text">Un bol, du bon beurre et une recette maison qu’on garde pour nous.</p>
+              </div>
+              <picture class="panel-fallback">
+                <source srcset="assets/transparent/seq/bowl-1.webp" type="image/webp">
+                <img src="assets/transparent/seq/bowl-1.png" width="847" height="600" loading="lazy" decoding="async" data-i18n-attr="alt:alt.ch1" alt="Du beurre dans un bol">
+              </picture>
+            </li>
+
+            <li class="panel" id="ch-2" data-tone="pink">
+              <div class="panel-copy">
+                <p class="step-kicker"><span class="step-n">02</span><span class="chapter-name" data-i18n="ch2.name">Fouetter</span></p>
+                <h3 class="panel-title" data-split data-i18n="ch2.title">Doux comme un nuage</h3>
+                <p class="panel-text" data-i18n="ch2.text">On fouette jusqu’à obtenir une crème légère. C’est là que naît le fondant.</p>
+              </div>
+              <picture class="panel-fallback">
+                <source srcset="assets/transparent/seq/bowl-2.webp" type="image/webp">
+                <img src="assets/transparent/seq/bowl-2.png" width="847" height="600" loading="lazy" decoding="async" data-i18n-attr="alt:alt.ch2" alt="Une crème légère dans un bol">
+              </picture>
+            </li>
+
+            <li class="panel" id="ch-3" data-tone="butter">
+              <div class="panel-copy">
+                <p class="step-kicker"><span class="step-n">03</span><span class="chapter-name" data-i18n="ch3.name">Pépites</span></p>
+                <h3 class="panel-title" data-split data-i18n="ch3.title">Des pépites partout</h3>
+                <p class="panel-text" data-i18n="ch3.text">Une pâte maison, généreuse, avec des pépites de chocolat dans chaque bouchée.</p>
+              </div>
+              <picture class="panel-fallback">
+                <source srcset="assets/transparent/seq/bowl-3.webp" type="image/webp">
+                <img src="assets/transparent/seq/bowl-3.png" width="847" height="600" loading="lazy" decoding="async" data-i18n-attr="alt:alt.ch3" alt="Pâte à cookies avec pépites de chocolat">
+              </picture>
+            </li>
+
+            <li class="panel" id="ch-4" data-tone="mint">
+              <div class="panel-copy">
+                <p class="step-kicker"><span class="step-n">04</span><span class="chapter-name" data-i18n="ch4.name">Façonner</span></p>
+                <h3 class="panel-title" data-split data-i18n="ch4.title">Roulées à la main</h3>
+                <p class="panel-text" data-i18n="ch4.text">Chaque boule est façonnée une à une, dorée ou cacao.</p>
+              </div>
+              <picture class="panel-fallback">
+                <source srcset="assets/transparent/seq/tray-0.webp" type="image/webp">
+                <img src="assets/transparent/seq/tray-0.png" width="900" height="461" loading="lazy" decoding="async" data-i18n-attr="alt:alt.ch4" alt="Boules de cookie dorées et cacao sur une plaque">
+              </picture>
+            </li>
+
+            <li class="panel" id="ch-5" data-tone="choc">
+              <div class="panel-copy">
+                <p class="step-kicker"><span class="step-n">05</span><span class="chapter-name" data-i18n="ch5.name">Cuire</span></p>
+                <h3 class="panel-title" data-split data-i18n="ch5.title">Tout droit du four</h3>
+                <p class="panel-text" data-i18n="ch5.text">Dorées dehors, fondantes dedans. Toute la cuisine sent le cookie.</p>
+              </div>
+              <picture class="panel-fallback">
+                <source srcset="assets/transparent/seq/tray-1.webp" type="image/webp">
+                <img src="assets/transparent/seq/tray-1.png" width="900" height="461" loading="lazy" decoding="async" data-i18n-attr="alt:alt.ch5" alt="Mini cookies dorés à la sortie du four">
+              </picture>
+            </li>
+
+            <li class="panel" id="ch-6" data-tone="lilac">
+              <div class="panel-copy">
+                <p class="step-kicker"><span class="step-n">06</span><span class="chapter-name" data-i18n="ch6.name">Remplir</span></p>
+                <h3 class="panel-title" data-split data-i18n="ch6.title">On remplit le gobelet</h3>
+                <p class="panel-text" data-i18n="ch6.text">Les boules tombent dans un gobelet cristal, dorées et cacao mélangées.</p>
+              </div>
+              <picture class="panel-fallback">
+                <source srcset="assets/transparent/seq/cup-2.webp" type="image/webp">
+                <img src="assets/transparent/seq/cup-2.png" width="459" height="900" loading="lazy" decoding="async" data-i18n-attr="alt:alt.ch6" alt="Gobelet transparent rempli de mini cookies dorés et cacao">
+              </picture>
+            </li>
+
+            <li class="panel" id="ch-7" data-tone="pink">
+              <div class="panel-copy">
+                <p class="step-kicker"><span class="step-n">07</span><span class="chapter-name" data-i18n="ch7.name">Verser</span></p>
+                <h3 class="panel-title" data-split data-i18n="ch7.title">Double dip</h3>
+                <p class="panel-text" data-i18n="ch7.text">Chocolat au lait et chocolat blanc, chacun dans son compartiment, à l’écart des cookies.</p>
+              </div>
+              <picture class="panel-fallback">
+                <source srcset="assets/transparent/seq/cup-3.webp" type="image/webp">
+                <img src="assets/transparent/seq/cup-3.png" width="459" height="900" loading="lazy" decoding="async" data-i18n-attr="alt:alt.ch7" alt="Gobelet avec l’insert de chocolat au lait et chocolat blanc">
+              </picture>
+            </li>
+
+            <li class="panel" id="ch-8" data-tone="peach">
+              <div class="panel-copy">
+                <p class="step-kicker"><span class="step-n">08</span><span class="chapter-name" data-i18n="ch8.name">Sceller</span></p>
+                <h3 class="panel-title" data-split data-i18n="ch8.title">Scellé avec un pop</h3>
+                <p class="panel-text" data-i18n="ch8.text">Un dôme, un sticker, et c’est prêt à croquer.</p>
+              </div>
+              <picture class="panel-fallback">
+                <source srcset="assets/transparent/hero/hero-cup.webp?v=3" type="image/webp">
+                <img src="assets/transparent/hero/hero-cup.png?v=3" width="604" height="1000" loading="lazy" decoding="async" data-i18n-attr="alt:alt.ch8" alt="Gobelet Cookie POP fermé avec couvercle dôme et sticker">
+              </picture>
+            </li>
+          </ol>
+
+          <!-- the product being made (decorative: each step's text describes it) -->
+          <div class="stage" aria-hidden="true">
+            <span class="glow"></span>
+            <span class="floor"></span>
+            <div class="rig rig-bowl">
+              <img class="f" src="assets/transparent/seq/bowl-0.webp" width="847" height="600" alt="" decoding="async">
+              <img class="f reveal-r" src="assets/transparent/seq/bowl-4.webp" width="847" height="600" alt="" decoding="async">
+              <img class="f" src="assets/transparent/seq/bowl-1.webp" width="847" height="600" alt="" decoding="async">
+              <img class="f reveal-c" src="assets/transparent/seq/bowl-2.webp" width="847" height="600" alt="" decoding="async">
+              <img class="f reveal-c" src="assets/transparent/seq/bowl-3.webp" width="847" height="600" alt="" decoding="async">
+              <img class="f butter" src="assets/transparent/parts/butter.webp" width="847" height="600" alt="" decoding="async">
+            </div>
+            <div class="ovencam">
+              <div class="rig rig-oven">
+                <img class="f" src="assets/transparent/parts/oven-body.webp" width="736" height="708" alt="" decoding="async">
+                <img class="f" src="assets/transparent/parts/oven-body-baked.webp" width="736" height="708" alt="" decoding="async">
+                <img class="f" src="assets/transparent/parts/oven-body-lit.webp" width="736" height="708" alt="" decoding="async">
+                <img class="f flap" src="assets/transparent/parts/oven-flap.webp" width="736" height="708" alt="" decoding="async">
+                <span class="steam s1"></span><span class="steam s2"></span><span class="steam s3"></span>
+              </div>
+              <div class="rig rig-otray">
+                <img class="f" src="assets/transparent/parts/oven-tray-raw.webp" width="736" height="708" alt="" decoding="async">
+                <img class="f" src="assets/transparent/parts/oven-tray-baked.webp" width="736" height="708" alt="" decoding="async">
+              </div>
+              <div class="rig rig-door">
+                <img class="f door" src="assets/transparent/parts/oven-door.webp" width="736" height="708" alt="" decoding="async">
+                <span class="oven-light"></span>
+              </div>
+            </div>
+            <div class="rig rig-tray">
+              <img class="f" src="assets/transparent/seq/tray-2.webp" width="900" height="461" alt="" decoding="async">
+              <img class="tb" src="assets/transparent/parts/ball-0.webp" style="left:15.89%;top:13.17%;width:11.22%" alt="" decoding="async"><img class="tb" src="assets/transparent/parts/ball-1.webp" style="left:27.22%;top:13.82%;width:11.11%" alt="" decoding="async"><img class="tb" src="assets/transparent/parts/ball-2.webp" style="left:37.67%;top:13.61%;width:12.11%" alt="" decoding="async"><img class="tb" src="assets/transparent/parts/ball-3.webp" style="left:49.11%;top:13.61%;width:12.22%" alt="" decoding="async"><img class="tb" src="assets/transparent/parts/ball-4.webp" style="left:60.56%;top:13.82%;width:12.44%" alt="" decoding="async"><img class="tb" src="assets/transparent/parts/ball-5.webp" style="left:72.22%;top:13.17%;width:13.22%" alt="" decoding="async"><img class="tb" src="assets/transparent/parts/ball-6.webp" style="left:14.22%;top:29.37%;width:11.67%" alt="" decoding="async"><img class="tb" src="assets/transparent/parts/ball-7.webp" style="left:26.11%;top:29.81%;width:11.67%" alt="" decoding="async"><img class="tb" src="assets/transparent/parts/ball-8.webp" style="left:38.22%;top:30.02%;width:11.56%" alt="" decoding="async"><img class="tb" src="assets/transparent/parts/ball-9.webp" style="left:49.11%;top:29.59%;width:12.89%" alt="" decoding="async"><img class="tb" src="assets/transparent/parts/ball-10.webp" style="left:61.33%;top:29.59%;width:12.89%" alt="" decoding="async"><img class="tb" src="assets/transparent/parts/ball-11.webp" style="left:73.56%;top:29.37%;width:13.44%" alt="" decoding="async"><img class="tb" src="assets/transparent/parts/ball-12.webp" style="left:12.67%;top:46.44%;width:12.11%" alt="" decoding="async"><img class="tb" src="assets/transparent/parts/ball-13.webp" style="left:25.11%;top:46.65%;width:12.22%" alt="" decoding="async"><img class="tb" src="assets/transparent/parts/ball-14.webp" style="left:37.89%;top:46.87%;width:12.33%" alt="" decoding="async"><img class="tb" src="assets/transparent/parts/ball-15.webp" style="left:50.89%;top:46.44%;width:12.00%" alt="" decoding="async"><img class="tb" src="assets/transparent/parts/ball-16.webp" style="left:62.11%;top:46.65%;width:13.33%" alt="" decoding="async"><img class="tb" src="assets/transparent/parts/ball-17.webp" style="left:74.78%;top:46.44%;width:13.89%" alt="" decoding="async"><img class="tb" src="assets/transparent/parts/ball-18.webp" style="left:11.00%;top:65.23%;width:12.67%" alt="" decoding="async"><img class="tb" src="assets/transparent/parts/ball-19.webp" style="left:24.33%;top:65.01%;width:12.56%" alt="" decoding="async"><img class="tb" src="assets/transparent/parts/ball-20.webp" style="left:37.11%;top:65.23%;width:13.00%" alt="" decoding="async"><img class="tb" src="assets/transparent/parts/ball-21.webp" style="left:50.89%;top:65.01%;width:12.56%" alt="" decoding="async"><img class="tb" src="assets/transparent/parts/ball-22.webp" style="left:62.78%;top:65.01%;width:13.89%" alt="" decoding="async"><img class="tb" src="assets/transparent/parts/ball-23.webp" style="left:76.00%;top:64.36%;width:14.22%" alt="" decoding="async">
+            </div>
+            <div class="balls"><img src="assets/transparent/seq/p-golden-1.webp" alt="" decoding="async"><img src="assets/transparent/seq/p-cacao-2.webp" alt="" decoding="async"><img src="assets/transparent/seq/p-golden-3.webp" alt="" decoding="async"><img src="assets/transparent/seq/p-cacao-4.webp" alt="" decoding="async"><img src="assets/transparent/seq/p-golden-1.webp" alt="" decoding="async"><img src="assets/transparent/seq/p-cacao-2.webp" alt="" decoding="async"><img src="assets/transparent/seq/p-golden-3.webp" alt="" decoding="async"><img src="assets/transparent/seq/p-cacao-4.webp" alt="" decoding="async"><img src="assets/transparent/seq/p-golden-1.webp" alt="" decoding="async"><img src="assets/transparent/seq/p-cacao-2.webp" alt="" decoding="async"><img src="assets/transparent/seq/p-golden-3.webp" alt="" decoding="async"><img src="assets/transparent/seq/p-cacao-4.webp" alt="" decoding="async"><img src="assets/transparent/seq/p-golden-1.webp" alt="" decoding="async"><img src="assets/transparent/seq/p-cacao-2.webp" alt="" decoding="async"><img src="assets/transparent/seq/p-golden-3.webp" alt="" decoding="async"><img src="assets/transparent/seq/p-cacao-4.webp" alt="" decoding="async"><img src="assets/transparent/seq/p-golden-1.webp" alt="" decoding="async"><img src="assets/transparent/seq/p-cacao-2.webp" alt="" decoding="async"></div>
+            <div class="rig rig-cup">
+              <img class="f" src="assets/transparent/seq/cup-0.webp" width="459" height="900" alt="" decoding="async">
+              <img class="f fill" src="assets/transparent/seq/cup-2.webp" width="459" height="900" alt="" decoding="async">
+              <img class="f ins" src="assets/transparent/seq/cup-6.webp" width="459" height="900" alt="" decoding="async">
+              <img class="f ins-l" src="assets/transparent/seq/cup-5.webp" width="459" height="900" alt="" decoding="async">
+              <img class="f ins-r" src="assets/transparent/seq/cup-5.webp" width="459" height="900" alt="" decoding="async">
+              <span class="pour pour-l"></span><span class="pour pour-r"></span>
+              <img class="f lid" src="assets/transparent/parts/lid.webp" width="459" height="900" alt="" decoding="async">
+              <img class="sticker" src="assets/brand/logo-diecut.webp" width="640" height="506" alt="" decoding="async">
+            </div>
+            <div class="grains"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <img class="flour" src="assets/transparent/parts/flour.webp" width="700" height="681" alt="" decoding="async"><img class="flour" src="assets/transparent/parts/flour.webp" width="700" height="681" alt="" decoding="async">
+            <img class="whisk" src="assets/transparent/parts/whisk.webp" width="687" height="700" alt="" decoding="async">
+            <div class="chips">
+              <img src="assets/transparent/seq/p-chip-1.webp" alt="" decoding="async"><img src="assets/transparent/seq/p-chip-2.webp" alt="" decoding="async"><img src="assets/transparent/seq/p-chip-3.webp" alt="" decoding="async"><img src="assets/transparent/seq/p-chip-4.webp" alt="" decoding="async"><img src="assets/transparent/seq/p-chip-1.webp" alt="" decoding="async"><img src="assets/transparent/seq/p-chip-2.webp" alt="" decoding="async"><img src="assets/transparent/seq/p-chip-3.webp" alt="" decoding="async"><img src="assets/transparent/seq/p-chip-4.webp" alt="" decoding="async">
+            </div>
+            <svg class="burst" viewBox="0 0 200 200"><g><path d="M100 18v26M100 156v26M18 100h26M156 100h26M42 42l18 18M140 140l18 18M158 42l-18 18M60 140l-18 18"/></g></svg>
+          </div>
+
+          <nav class="story-tabs" data-i18n-attr="aria-label:a11y.chapters" aria-label="Étapes">
+            <button type="button" class="tab" aria-current="step"><span class="tab-name"></span><span class="tab-fill" aria-hidden="true"></span></button>
+            <button type="button" class="tab"><span class="tab-name"></span><span class="tab-fill" aria-hidden="true"></span></button>
+            <button type="button" class="tab"><span class="tab-name"></span><span class="tab-fill" aria-hidden="true"></span></button>
+            <button type="button" class="tab"><span class="tab-name"></span><span class="tab-fill" aria-hidden="true"></span></button>
+            <button type="button" class="tab"><span class="tab-name"></span><span class="tab-fill" aria-hidden="true"></span></button>
+            <button type="button" class="tab"><span class="tab-name"></span><span class="tab-fill" aria-hidden="true"></span></button>
+            <button type="button" class="tab"><span class="tab-name"></span><span class="tab-fill" aria-hidden="true"></span></button>
+            <button type="button" class="tab"><span class="tab-name"></span><span class="tab-fill" aria-hidden="true"></span></button>
+          </nav>
+        </div>
+      </div>
+    </section>
+
+    <!-- MARQUEE -->
+    <section class="marquee" aria-label="Dip. Bite. Repeat.">
+      <p class="sr-only">DIP. BITE. REPEAT. <span lang="ar" dir="rtl">غطّس • كول • عاود</span></p>
+      <div class="marquee-track" aria-hidden="true" dir="ltr">
+        <div class="marquee-group">
+          <span>Dip. Bite. Repeat.</span><img src="assets/transparent/seq/p-golden-1.webp" alt=""><span class="ar" lang="ar" dir="rtl">غطّس • كول • عاود</span><img src="assets/transparent/seq/p-cacao-2.webp" alt="">
+          <span>Dip. Bite. Repeat.</span><img src="assets/transparent/seq/p-golden-3.webp" alt=""><span class="ar" lang="ar" dir="rtl">غطّس • كول • عاود</span><img src="assets/transparent/seq/p-cacao-1.webp" alt="">
+        </div>
+        <div class="marquee-group">
+          <span>Dip. Bite. Repeat.</span><img src="assets/transparent/seq/p-golden-1.webp" alt=""><span class="ar" lang="ar" dir="rtl">غطّس • كول • عاود</span><img src="assets/transparent/seq/p-cacao-2.webp" alt="">
+          <span>Dip. Bite. Repeat.</span><img src="assets/transparent/seq/p-golden-3.webp" alt=""><span class="ar" lang="ar" dir="rtl">غطّس • كول • عاود</span><img src="assets/transparent/seq/p-cacao-1.webp" alt="">
+        </div>
+      </div>
+    </section>
+
+    <!-- SIZES: the real line-up photo -->
+    <section class="sizes" id="sizes" aria-labelledby="sizes-title">
+      <div class="wrap section-head section-head--center">
+        <p class="pill" data-reveal data-i18n="sizes.label">La gamme</p>
+        <h2 class="display" id="sizes-title" data-split data-i18n="sizes.title">Choisis ton pop.</h2>
+        <p class="section-aside" data-reveal data-i18n="sizes.text">Mêmes cookies, mêmes dips. Choisis juste selon ta faim.</p>
+      </div>
+      <div class="wrap">
+        <figure class="lineup" data-reveal>
+          <picture>
+            <source srcset="assets/poster/lineup.webp" type="image/webp">
+            <img src="assets/poster/lineup.jpg" width="1264" height="843" loading="lazy" decoding="async" data-i18n-attr="alt:alt.lineup"
+                 alt="Les trois gobelets Cookie POP, petit, moyen et grand, remplis de mini boules de cookie avec le double dip chocolat">
+          </picture>
+          <figcaption class="lineup-tags">
+            <span class="tag tag--s"><b data-i18n="sizes.s">Petit</b><i class="price" data-price="s"></i></span>
+            <span class="tag tag--m"><em class="badge" data-i18n="sizes.badge">Le préféré</em><b data-i18n="sizes.m">Moyen</b><i class="price" data-price="m"></i></span>
+            <span class="tag tag--l"><b data-i18n="sizes.l">Grand</b><i class="price" data-price="l"></i></span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- FLAVOURS -->
+    <section class="flavours" id="flavours" aria-labelledby="flavours-title">
+      <div class="wrap section-head section-head--center">
+        <p class="pill" data-reveal data-i18n="flav.label">Les saveurs</p>
+        <h2 class="display" id="flavours-title" data-split data-i18n="flav.title">Quatre saveurs à croquer.</h2>
+        <p class="section-aside" data-reveal data-i18n="flav.text">Classique, cacao, fraise ou pistache : une couleur pour chaque envie.</p>
+      </div>
+      <ul class="wrap flavour-row">
+        <li class="flavour flavour--classic" data-reveal>
+          <img src="assets/transparent/flavours/classic.webp?v=3" width="280" height="296" loading="lazy" decoding="async" alt="" aria-hidden="true">
+          <span class="flavour-name" data-i18n="flav.classic">Classique</span>
+          <span class="script flavour-note" data-i18n="flav.classicNote">pépites de chocolat</span>
+        </li>
+        <li class="flavour flavour--cacao" data-reveal>
+          <img src="assets/transparent/flavours/cacao.webp?v=3" width="282" height="298" loading="lazy" decoding="async" alt="" aria-hidden="true">
+          <span class="flavour-name" data-i18n="flav.cacao">Cacao</span>
+          <span class="script flavour-note" data-i18n="flav.cacaoNote">double chocolat</span>
+        </li>
+        <li class="flavour flavour--fraise" data-reveal>
+          <img src="assets/transparent/flavours/fraise.webp?v=3" width="290" height="307" loading="lazy" decoding="async" alt="" aria-hidden="true">
+          <span class="flavour-name" data-i18n="flav.fraise">Fraise</span>
+          <span class="script flavour-note" data-i18n="flav.fraiseNote">toute rose</span>
+        </li>
+        <li class="flavour flavour--pistache" data-reveal>
+          <img src="assets/transparent/flavours/pistache.webp?v=3" width="282" height="298" loading="lazy" decoding="async" alt="" aria-hidden="true">
+          <span class="flavour-name" data-i18n="flav.pistache">Pistache</span>
+          <span class="script flavour-note" data-i18n="flav.pistacheNote">toute verte</span>
+        </li>
+      </ul>
+      <div class="wrap">
+        <figure class="lineup lineup--color" data-reveal>
+          <picture>
+            <source srcset="assets/poster/lineup-colored.webp" type="image/webp">
+            <img src="assets/poster/lineup-colored.jpg" width="1264" height="843" loading="lazy" decoding="async" data-i18n-attr="alt:alt.lineupColor"
+                 alt="Gobelets Cookie POP remplis de mini boules de cookie classique, cacao, fraise et pistache, avec le double dip chocolat">
+          </picture>
+        </figure>
+      </div>
+    </section>
+
+    <!-- DIPS -->
+    <section class="dips" id="dips" aria-labelledby="dips-title">
+      <div class="wrap section-head section-head--center">
+        <p class="pill" data-reveal data-i18n="dips.label">Les dips</p>
+        <h2 class="display" id="dips-title" data-split data-i18n="dips.title">Lait. Blanc. Les deux.</h2>
+        <p class="section-aside" data-reveal data-i18n="dips.text">Deux chocolats scellés chacun dans son compartiment du couvercle, pour que les cookies restent croquants jusqu’au moment de tremper.</p>
+      </div>
+      <div class="wrap dips-row">
+        <figure class="dip dip--milk" data-reveal>
+          <picture>
+            <source srcset="assets/transparent/dips/dip-milk-chocolate.webp" type="image/webp">
+            <img src="assets/transparent/dips/dip-milk-chocolate.png" width="1200" height="805" loading="lazy" decoding="async" data-i18n-attr="alt:alt.dipMilk" alt="Bol de chocolat au lait avec une boule de cookie">
+          </picture>
+          <figcaption><span class="dip-name" data-i18n="dips.milk">Chocolat au lait</span><span class="script dip-note" data-i18n="dips.milkNote">le classique</span></figcaption>
+        </figure>
+        <figure class="dip dip--white" data-reveal>
+          <picture>
+            <source srcset="assets/transparent/dips/dip-white-chocolate.webp" type="image/webp">
+            <img src="assets/transparent/dips/dip-white-chocolate.png" width="1200" height="805" loading="lazy" decoding="async" data-i18n-attr="alt:alt.dipWhite" alt="Bol de chocolat blanc avec une boule de cookie">
+          </picture>
+          <figcaption><span class="dip-name" data-i18n="dips.white">Chocolat blanc</span><span class="script dip-note" data-i18n="dips.whiteNote">tout doux</span></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ORDER (+ shops, once there are some) -->
+    <section class="order" id="order" aria-labelledby="order-title">
+      <img class="order-ball ob-1" src="assets/transparent/seq/p-golden-2.webp" alt="" width="200" height="200" aria-hidden="true">
+      <img class="order-ball ob-2" src="assets/transparent/seq/p-cacao-3.webp" alt="" width="200" height="200" aria-hidden="true">
+      <img class="order-ball ob-3" src="assets/transparent/seq/p-golden-4.webp" alt="" width="200" height="200" aria-hidden="true">
+      <div class="wrap order-inner">
+        <p class="pill" data-reveal data-i18n="order.label">Commander</p>
+        <h2 class="display echo" id="order-title" data-echo><span data-i18n="order.title">Commande ton pop.</span></h2>
+        <p class="section-aside" data-reveal data-i18n="order.text">Fêtes, anniversaires, événements ou ta boutique : écris-nous et on prépare tes gobelets.</p>
+        <div class="btn-row order-btns" data-reveal>
+          <a class="btn btn-choc" data-cfg="instagram" href="#" target="_blank" rel="noopener"><span data-i18n="order.ig">Écrire sur Instagram</span></a>
+          <a class="btn btn-ghost" data-cfg="whatsapp" href="#" target="_blank" rel="noopener"><span data-i18n="order.wa">WhatsApp</span></a>
+        </div>
+        <p class="order-soon" data-reveal data-i18n="order.soon">Les commandes en ligne arrivent très bientôt ♡</p>
+        <div class="shops-block" data-cfg="shops">
+          <h3 class="shops-title" data-i18n="find.title">Près de chez toi</h3>
+          <ul class="shops"></ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <img class="footer-logo" src="assets/brand/logo-diecut.webp" width="640" height="506" loading="lazy" decoding="async" alt="Cookie POP">
+      <p class="script footer-slogan" dir="ltr" lang="en">Dip. Bite. Repeat.</p>
+      <p class="footer-slogan--ar" lang="ar" dir="rtl">غطّس • كول • عاود</p>
+      <p class="footer-meta" data-i18n="footer.meta">Fait maison · Tunisie</p>
+      <p class="footer-copy">© <span id="year">2026</span> Cookie POP</p>
+    </div>
+  </footer>
+</body>
+</html>
