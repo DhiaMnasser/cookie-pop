@@ -201,6 +201,34 @@
   }
   langButtons.forEach(function (b) { b.addEventListener('click', function () { setLang(b.getAttribute('data-lang')); }); });
 
+  /* Header items keep one width in every language, so nothing moves when the language changes:
+     each link / the Order button is sized to its longest translation, text centred. */
+  function lockHeaderWidths() {
+    var FONTS = { ar: '"IBM Plex Sans Arabic", "Nunito", system-ui, sans-serif', other: '"Nunito", system-ui, sans-serif' };
+    var probe = document.createElement('span');
+    probe.style.cssText = 'position:absolute;left:-9999px;top:0;visibility:hidden;white-space:nowrap';
+    document.body.appendChild(probe);
+    document.querySelectorAll('.site-header [data-i18n]').forEach(function (n) {
+      var box = n.closest('a, button') || n, cs = getComputedStyle(box), key = n.getAttribute('data-i18n'), w = 0;
+      ['fr', 'en', 'ar'].forEach(function (l) {
+        if (!I18N[l] || I18N[l][key] == null) return;
+        probe.style.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + (l === 'ar' ? FONTS.ar : FONTS.other);
+        probe.innerHTML = I18N[l][key];
+        w = Math.max(w, probe.getBoundingClientRect().width);
+      });
+      var extra = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + parseFloat(cs.borderLeftWidth) + parseFloat(cs.borderRightWidth);
+      if (box.querySelector('svg')) extra += box.querySelector('svg').getBoundingClientRect().width + parseFloat(cs.columnGap || 0);
+      box.style.minWidth = Math.ceil(w + extra + 2) + 'px';
+      box.style.justifyContent = 'center';
+    });
+    probe.remove();
+  }
+  if (document.fonts && document.fonts.load) {
+    Promise.all([
+      document.fonts.load('800 15px "Nunito"'), document.fonts.load('800 15px "IBM Plex Sans Arabic"', 'عربي')
+    ]).then(lockHeaderWidths, lockHeaderWidths);
+  } else lockHeaderWidths();
+
   /* ======================================================================
      Header: mobile menu + hide on scroll down
      ====================================================================== */
@@ -354,8 +382,10 @@
     var ovenBody = q('.rig-oven .f');                               // body, body-baked, body-lit, flap
     var flap = one('.flap'), doorImg = one('.door'), ovenLight = one('.oven-light');
     var ot = q('.rig-otray .f');                                    // tray on the rack: raw, baked
+    var bakeSteam = one('.bake-steam');                              // wisps over the baking cookies
     var tb = q('.rig-tray .tb');                                    // the 24 dough balls on the flat tray
-    var fill = one('.fill'), ins = one('.ins'), insL = one('.ins-l'), insR = one('.ins-r');
+    var tbs = q('.rig-tray .tbs'), mound = one('.rig-tray .mound'), moundSh = one('.rig-tray .mound-sh');   // ball shadows, the dough mound
+    var ins = one('.ins'), insL = one('.ins-l'), insR = one('.ins-r');
     var pourL = one('.pour-l'), pourR = one('.pour-r'), lid = one('.lid');
     var sticker = one('.sticker'), burst = one('.burst'), glow = one('.glow'), steam = q('.steam');
     var grains = q('.grains i'), flour = q('.flour'), whisk = one('.whisk'), chips = q('.chips img'), rain = q('.balls img');
@@ -364,8 +394,8 @@
     var wordsOf = function (p) { return p.querySelectorAll('.panel-title .w > span'); };
 
     // geometry measured from the keyframes (tools/extract_parts.py → parts.json)
-    var FLAP_TOP = 0.7627, DOOR_HINGE = 0.8008, WIN_C = [0.4987, 0.3962], OTRAY_C = 0.5057, OTRAY_W = 0.6902;
-    var FILL_FROM = 91.9, FILL_TO = 40.2, INS_TOP = 14.1, INS_BOT = 40.2;
+    var FLAP_TOP = 0.7627, DOOR_HINGE = 0.8008, WIN_C = [0.4987, 0.3962], OTRAY_C = 0.5169, OTRAY_W = 0.6399;
+    var INS_TOP = 14.1, INS_BOT = 40.2;
 
     function box(el) { return { l: el.offsetLeft, t: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight }; }
     function pt(el, fx, fy, pose) {
@@ -376,8 +406,8 @@
     var BOWL_POUR = function () { return { x: -W() * 0.04, y: -H() * 0.27, s: 0.58 }; };
     // the tray on the rack, at the front of the oven, matched in width and centre to the flat tray
     var OT_FRONT = function () {
-      var s = 0.945 * box(tray).w * 0.9 / (OTRAY_W * box(oven).w);
-      var ty = pt(tray, 0.5, 0.5, TRAY_SHAPE()).y, oy = pt(oven, 0.5, OTRAY_C, {}).y;
+      var s = 0.93 * box(tray).w * 0.9 / (OTRAY_W * box(oven).w);   // the pan is 93% of the flat tray picture's width
+      var ty = pt(tray, 0.5, 0.474, TRAY_SHAPE()).y, oy = pt(oven, 0.5, OTRAY_C, {}).y;
       return { y: ty - oy, s: s };
     };
     var CAM_ORIGIN = function () { var c = pt(oven, WIN_C[0], WIN_C[1], {}); return c.x + 'px ' + c.y + 'px'; };
@@ -415,18 +445,29 @@
     gsap.set(bowl, { opacity: 1, x: function () { return W() * 1.15; }, rotation: 16 });
     gsap.set(bf[1], { '--r': -16 });
     gsap.set(bf[2], { opacity: 0 });
-    gsap.set([bf[3], bf[4]], { '--a': -60 });
+    gsap.set([bf[3], bf[4]], { '--b0': -16, '--b1': -16, '--b2': -16, '--b3': -16, '--b4': -16, '--b5': -16, '--b6': -16, '--bf': 0 });
     gsap.set(butter, { opacity: 0, y: 0, rotation: 0 });
     gsap.set([ovenBody[1], ovenBody[2], ovenLight, ot[1]], { opacity: 0 });
+    gsap.set(bakeSteam, { opacity: 0 });
     gsap.set(otray, { transformOrigin: '50% ' + OTRAY_C * 100 + '%' });
     gsap.set(flap, { scaleY: 1, transformOrigin: '50% ' + FLAP_TOP * 100 + '%' });
     gsap.set(doorImg, { rotationX: -90, opacity: 0, transformPerspective: 2600, transformOrigin: '50% ' + DOOR_HINGE * 100 + '%' });
-    gsap.set(tb, { opacity: 0, x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0, transformOrigin: '50% 85%' });
-    gsap.set(fill, { '--ct': 100 });
+    gsap.set(tb, { opacity: 0, x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0 });
+    // each ball spins round its own centre, and its shadow sits flat under it (the ball images are not centred in their boxes)
+    var core = tb.map(function (el) {
+      var c = (el.getAttribute('data-core') || '0.5,0.5,0.9,0.7').split(',').map(Number), b = box(el);
+      return { x: b.l + c[0] * b.w, y: b.t + c[1] * b.h, foot: b.t + c[2] * b.h, d: c[3] * b.w, ox: c[0], oy: c[1] };
+    });
+    tb.forEach(function (el, k) {
+      var c = core[k], sw = c.d * 1.05, sh = sw * 0.3;
+      gsap.set(el, { transformOrigin: (c.ox * 100) + '% ' + (c.oy * 100) + '%' });
+      el.classList.toggle('is-back', k < 12);
+      Object.assign(tbs[k].style, { left: (c.x - sw / 2) + 'px', top: (c.foot - sh * 0.55) + 'px', width: sw + 'px', height: sh + 'px' });
+    });
+    gsap.set(tbs, { opacity: 0, x: 0, y: 0, scale: 1 });
+    gsap.set([mound, moundSh], { opacity: 0, x: 0, y: 0, scale: 1, scaleX: 1, scaleY: 1, rotation: 0, transformOrigin: '50% 94%' });
     gsap.set(ins, { opacity: 0, y: 0, rotation: 0 });
-    gsap.set(insL, { '--fl': 41 });
-    gsap.set(insR, { '--fr': 41 });
-    gsap.set([pourL, pourR], { opacity: 0, scaleY: 0, transformOrigin: '50% 0%' });
+    gsap.set([pourL, pourR], { opacity: 0 });
     gsap.set(lid, { opacity: 0, y: 0, rotation: 0 });
     gsap.set([glow].concat(steam), { opacity: 0 });
     gsap.set(grains.concat(flour, chips, rain), { opacity: 0, x: 0, y: 0, xPercent: -50, yPercent: -50 });
@@ -469,6 +510,16 @@
       tl.to(whisk, { x: function () { return ctr().x + W() * 0.5; }, y: function () { return ctr().y - H() * 0.55; }, rotation: 20, duration: 0.45, ease: 'power3.in' }, t0 + 0.45 + sweep)
         .set(whisk, { opacity: 0 }, t0 + 0.9 + sweep);
     }
+    // the new batter shows up in the whisk's wake: each blob opens as the whisk head passes it, then all grow and merge
+    function mixIn(el, t0, sweep, turns) {
+      var n = 7, lap = sweep / turns;
+      for (var k = 0; k < n; k++) {
+        var at = t0 + lap * (k / n);
+        tl.to(el, { ['--b' + k]: 14, duration: lap * 0.6, ease: 'sine.out' }, at)
+          .to(el, { ['--b' + k]: 75, duration: sweep - lap * (k / n), ease: 'sine.inOut' }, at + lap * 0.6);
+      }
+      tl.to(el, { '--bf': 1, duration: sweep * 0.5, ease: 'sine.in' }, t0 + sweep * 0.6);
+    }
     function stream(list, t0, spread, dur) {
       list.forEach(function (g, k) {
         var at = t0 + k * spread;
@@ -491,7 +542,7 @@
     /* 02 — whipped: the whisk goes round, the cream appears in its wake */
     panelIn(1, 2.4);
     whiskPass(2.65, 1.1, 2);
-    tl.to(bf[3], { '--a': 360, duration: 1.1, ease: 'power1.inOut' }, 3.1);
+    mixIn(bf[3], 3.1, 1.1, 2);
     wobble(bowl, 3.1, 2.2, 5, 0.2);
 
     /* 03 — flour falls in and puffs up, chips rain, the whisk goes round again: dough */
@@ -512,41 +563,87 @@
         .to(c, { opacity: 0, duration: 0.15 }, at + 0.62);
     });
     whiskPass(5.35, 0.8, 2);
-    tl.to(bf[4], { '--a': 360, duration: 0.8, ease: 'power1.inOut' }, 5.8);
+    mixIn(bf[4], 5.8, 0.8, 2);
     wobble(bowl, 5.8, 2.6, 4, 0.18);
 
-    /* 04 — the bowl lifts and tips; one ball at a time drops onto the empty tray */
+    /* 04 — the bowl tips the whole dough out onto the tray; the balls are rolled off the mound one by one,
+          each rolling to its place, and the mound shrinks as it goes */
     panelIn(3, 6.8);
-    tl.to(bowl, { x: function () { return BOWL_POUR().x; }, y: function () { return BOWL_POUR().y; }, scaleX: 0.58, scaleY: 0.58, duration: 0.8, ease: 'power3.inOut' }, 6.95)
-      .to(bowl, { rotation: 16, duration: 0.5, ease: 'power2.inOut' }, 7.5);
-    tl.fromTo(tray, { opacity: 1, x: 0, y: function () { return H() * 0.8; }, scaleX: 0.9, scaleY: 0.9 },
+    var TS = 0.9;                                                     // the tray's scale (TRAY_SHAPE)
+    var MOUND = function () {                                         // the mound's base centre, on stage
+      var m = box(mound), t = box(tray);
+      return pt(tray, (m.l + m.w / 2) / t.w, (m.t + m.h * 0.94) / t.h, TRAY_SHAPE());
+    };
+    var DROP = function () { return H() * 0.36; };                    // how far the dough falls
+    var TIP_A = 115;                                                  // how far the bowl tips (deg)
+    var TIP_S = 0.44;                                                 // bowl scale here: its dough then matches the mound's size
+    var TIP = function () {                                           // bowl pose that puts its mouth right above the mound
+      var b = box(bowl), s = TIP_S, m = MOUND(), r = TIP_A * Math.PI / 180;
+      var mouth = { x: m.x, y: m.y - DROP() };
+      // the rim's centre is half a bowl-height above the bowl's centre; tipped, it swings out right and down
+      var cx = mouth.x - Math.sin(r) * b.h / 2 * s, cy = mouth.y + Math.cos(r) * b.h / 2 * s;
+      return { x: cx - (b.l + b.w / 2), y: cy - (b.t + b.h / 2) };
+    };
+    // where the dough sits inside the tipped bowl (its centre is at 46% / 27% of the bowl picture), as a move of the mound
+    var DOUGH_OUT = function () {
+      var b = box(bowl), p = TIP(), r = TIP_A * Math.PI / 180;
+      var ox = (0.465 - 0.5) * b.w * TIP_S, oy = (0.27 - 0.5) * b.h * TIP_S;
+      var c = { x: b.l + b.w / 2 + p.x + ox * Math.cos(r) - oy * Math.sin(r), y: b.t + b.h / 2 + p.y + ox * Math.sin(r) + oy * Math.cos(r) };
+      var m = box(mound), base = MOUND(), mc = { x: base.x, y: base.y - m.h * 0.44 * TS };   // the mound's centre on stage
+      return { x: (c.x - mc.x) / TS, y: (c.y - mc.y) / TS, s: (0.785 * b.w * TIP_S) / (m.w * TS) };
+    };
+    tl.to(bowl, { x: function () { return TIP().x; }, y: function () { return TIP().y; }, scaleX: TIP_S, scaleY: TIP_S, duration: 0.8, ease: 'power3.inOut' }, 6.95)
+      .set(bowl, { zIndex: 1 }, 6.95)                                 // the bowl hangs above the back of the tray: behind it
+      .to(bowl, { rotation: TIP_A, duration: 0.45, ease: 'power2.in' }, 7.45);
+    tl.fromTo(tray, { opacity: 1, x: 0, y: function () { return H() * 0.8; }, scaleX: TS, scaleY: TS },
       { y: function () { return TRAY_SHAPE().y; }, duration: 0.85, ease: 'power3.out', immediateRender: false }, 7.05);
-    var LIP = function () { return pt(bowl, 0.72, 0.3, BOWL_POUR()); };
-    var order = [];                                   // nearest column first, then outwards: reads as one flow
-    for (var c = 5; c >= 0; c--) for (var r = 0; r < 4; r++) order.push(r * 6 + c);
+    // the dough slides out of the tipped bowl and lands as one mound, with a squash; the bowl is left empty
+    tl.set(bf.slice(1), { opacity: 0 }, 7.86)
+      .fromTo(mound, { opacity: 1, x: function () { return DOUGH_OUT().x; }, y: function () { return DOUGH_OUT().y; },
+          scaleX: function () { return DOUGH_OUT().s; }, scaleY: function () { return DOUGH_OUT().s; }, rotation: TIP_A * 0.55 },
+        { x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0, duration: 0.34, ease: 'power2.in', immediateRender: false }, 7.86)
+      .to(mound, { scaleY: 0.8, scaleX: 1.12, duration: 0.08, ease: 'power2.out' }, 8.18)
+      .to(mound, { scaleY: 1, scaleX: 1, duration: 0.55, ease: 'elastic.out(1.1, 0.4)' }, 8.26)
+      .fromTo(moundSh, { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.32, ease: 'power2.in', immediateRender: false }, 7.86);
+    impact(tray, 8.18, 0.6);
+    tl.to(bowl, { y: function () { return -H() * 0.85; }, rotation: TIP_A + 25, opacity: 0, duration: 0.6, ease: 'power3.in' }, 8.2);
+    // the balls, nearest the mound first: each pops off the mound's edge and rolls to its place
+    var mc = function () { var m = box(mound); return { x: m.l + m.w / 2, y: m.t + m.h * 0.66, r: m.w * 0.2 }; };
+    var order = tb.map(function (el, k) { return k; });
+    (function () {
+      var m = mc();
+      order.sort(function (a, b) { return Math.hypot(core[a].x - m.x, core[a].y - m.y) - Math.hypot(core[b].x - m.x, core[b].y - m.y); });
+    })();
     order.forEach(function (k, n) {
-      var el = tb[k], at = 7.85 + n * 0.055;
-      var off = function (axis) {
-        var b = box(el), tbx = box(tray), s = 0.9;
-        var sx = pt(tray, (b.l + b.w / 2) / tbx.w, (b.t + b.h * 0.6) / tbx.h, TRAY_SHAPE());
-        var lip = LIP();
-        return axis === 'x' ? (lip.x - sx.x) / s : (lip.y - sx.y) / s;
+      var el = tb[k], at = 8.45 + n * 0.048;
+      var from = function () {                                          // the start point on the mound's edge, toward the ball's place
+        var m = mc(), c = core[k], dx = c.x - m.x, dy = c.y - m.y, len = Math.hypot(dx, dy) || 1;
+        var r = m.r * Math.cbrt(1 - n / order.length), my = m.y + (1 - Math.cbrt(1 - n / order.length)) * m.r;   // the mound is smaller by now
+        return { x: m.x + dx / len * r - c.x, y: my + dy / len * r * 0.5 - c.y, dist: len };
       };
-      tl.fromTo(el, { opacity: 1, x: function () { return off('x'); }, y: function () { return off('y'); }, rotation: -70, scaleX: 0.7, scaleY: 0.7 },
-        { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1, duration: 0.4, ease: 'power2.in', immediateRender: false }, at)
-        .to(el, { scaleY: 0.82, scaleX: 1.1, duration: 0.06, ease: 'power2.out' }, at + 0.4)
-        .to(el, { scaleY: 1, scaleX: 1, duration: 0.3, ease: 'elastic.out(1.2, 0.45)' }, at + 0.46);
+      // whole turns only, so every ball settles upright with its light from the top, as photographed
+      var roll = function () { var f = from(); return (f.x < 0 ? 1 : -1) * Math.max(1, Math.round(Math.hypot(f.x, f.y) / (Math.PI * core[k].d))) * 360; };
+      var d = 0.45 + Math.min(0.35, from().dist / box(tray).w * 0.6);
+      tl.fromTo(el, { opacity: 0, x: function () { return from().x; }, y: function () { return from().y; }, scaleX: 0.5, scaleY: 0.5, rotation: 0 },
+        { opacity: 1, duration: 0.06, immediateRender: false }, at)
+        .to(el, { x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: function () { return roll(); }, duration: d, ease: 'power2.out' }, at)
+        .fromTo(tbs[k], { opacity: 0, x: function () { return from().x; }, y: function () { return from().y; }, scale: 0.5 },
+          { opacity: 1, x: 0, y: 0, scale: 1, duration: d, ease: 'power2.out', immediateRender: false }, at);
+      // the mound loses the volume of one ball (its height ~ cube root of what is left)
+      var left = 1 - (n + 1) / order.length, s = Math.max(0, Math.cbrt(left));
+      tl.to(mound, { scaleX: s * 1.02, scaleY: s, duration: 0.14, ease: 'power2.out' }, at)
+        .to(moundSh, { scale: Math.max(0.2, s), opacity: left > 0 ? 1 : 0, duration: 0.14, ease: 'power2.out' }, at);
     });
-    tl.to(bowl, { y: function () { return -H() * 0.85; }, rotation: 28, opacity: 0, duration: 0.6, ease: 'power3.in' }, 9.25);
+    tl.set(mound, { opacity: 0 }, 8.45 + order.length * 0.048 + 0.1);
 
     /* 05 — the oven rises; the tray slides onto the rack, the door shuts, we lean in to watch them bake */
     panelIn(4, 9.6);
     tl.set(cam, { transformOrigin: CAM_ORIGIN }, 9.6);
     tl.fromTo([oven, door], { opacity: 0, y: function () { return H() * 0.55; } }, { opacity: 1, y: 0, duration: 0.85, ease: 'power3.out', immediateRender: false }, 9.75);
     // hand-over: the flat tray tilts back into the oven's perspective
-    tl.fromTo(otray, { opacity: 0, x: 0, y: function () { return OT_FRONT().y; }, scaleX: function () { return OT_FRONT().s; }, scaleY: function () { return OT_FRONT().s * 1.45; } },
+    tl.fromTo(otray, { opacity: 0, x: 0, y: function () { return OT_FRONT().y; }, scaleX: function () { return OT_FRONT().s; }, scaleY: function () { return OT_FRONT().s * 1.65; } },
       { opacity: 1, scaleY: function () { return OT_FRONT().s; }, duration: 0.35, ease: 'power2.inOut', immediateRender: false }, 10.55)
-      .to(tray, { opacity: 0, scaleY: 0.62, duration: 0.35, ease: 'power2.inOut' }, 10.55);
+      .to(tray, { opacity: 0, scaleY: 0.9 * 0.605, duration: 0.35, ease: 'power2.inOut' }, 10.55);
     tl.to(otray, { y: 0, scaleX: 1, scaleY: 1, duration: 0.8, ease: 'power2.inOut' }, 10.9);
     tl.to(flap, { scaleY: 0, duration: 0.22, ease: 'power2.in' }, 11.75)
       .set(doorImg, { opacity: 1 }, 11.79)
@@ -557,6 +654,8 @@
       .to(glow, { opacity: 1, duration: 0.6, ease: 'power1.inOut' }, 12.4)
       .to(ovenLight, { opacity: 0.9, duration: 0.35, ease: 'power1.out' }, 12.45)
       .to([ovenBody[1], ot[1]], { opacity: 1, duration: 1.3, ease: 'sine.inOut' }, 12.7)   // they turn golden, gradually
+      .to(bakeSteam, { opacity: 1, duration: 0.6, ease: 'sine.out' }, 12.75)              // steam starts rising off them
+      .to(bakeSteam, { opacity: 0, duration: 0.35, ease: 'sine.in' }, 14.3)
       .to(ovenLight, { opacity: 0.55, duration: 0.3, ease: 'sine.inOut' }, 13.1)
       .to(ovenLight, { opacity: 0.95, duration: 0.3, ease: 'sine.inOut' }, 13.4)
       .to(ovenLight, { opacity: 0, duration: 0.3 }, 13.95)
@@ -564,10 +663,11 @@
     tl.to(doorImg, { rotationX: -90, duration: 0.34, ease: 'power2.out' }, 14.6)
       .set(doorImg, { opacity: 0 }, 14.94)
       .to(flap, { scaleY: 1, duration: 0.22, ease: 'power2.out' }, 14.85)
-      .to(ovenBody[2], { opacity: 1, duration: 0.3 }, 14.75);                              // lit, steamy, empty cavity
+      .to(ovenBody[2], { opacity: 0.55, duration: 0.3 }, 14.75);                           // lit, a little steamy: enough glow, not a fog
     steam.forEach(function (s, k) {
-      tl.fromTo(s, { opacity: 0, y: 0, scale: 0.7 }, { opacity: 0.9, y: function () { return -H() * 0.1; }, scale: 1.1, duration: 0.5, ease: 'sine.out', immediateRender: false }, 14.9 + k * 0.12)
-        .to(s, { opacity: 0, y: function () { return -H() * 0.22; }, duration: 0.5, ease: 'sine.in' }, 15.4 + k * 0.12);
+      // a light puff when the door opens, which clears quickly
+      tl.fromTo(s, { opacity: 0, y: 0, scale: 0.6 }, { opacity: 0.45, y: function () { return -H() * 0.08; }, scale: 0.9, duration: 0.4, ease: 'sine.out', immediateRender: false }, 14.9 + k * 0.1)
+        .to(s, { opacity: 0, y: function () { return -H() * 0.18; }, scale: 1, duration: 0.4, ease: 'sine.in' }, 15.3 + k * 0.1);
     });
     tl.to(otray, { y: function () { return H() * 1.35; }, scaleX: 1.7, scaleY: 1.7, duration: 0.75, ease: 'power2.in' }, 15.0)
       .set(otray, { opacity: 0 }, 15.76)
@@ -578,17 +678,88 @@
     panelIn(5, 15.2);
     tl.fromTo(cup, { opacity: 1, x: 0, y: function () { return H() * 0.75; }, rotation: 5 },
       { y: 0, rotation: 0, duration: 0.8, ease: 'back.out(1.2)', immediateRender: false }, 15.8);
-    var N = rain.length, R0 = 16.5, RS = 0.085;
+    // the pile is built from the falling balls themselves, row by row from the bottom; in each row a darker,
+    // slightly smaller back layer goes in first, then the front. Positions are fractions of the cup picture.
+    // Measured from it: the glass's outer edge runs from 9.6% in (22% down) to 24.4% in (89% down).
+    var WALL = function (fy) { return 0.096 + 0.222 * (fy - 0.222) + 0.03; };
+    var ASPECT = 900 / 459;                                                       // cup picture height / width
+    // a little settling simulation (run once): each ball is dropped at a random spot across the mouth, falls until it
+    // meets the bottom, the glass or another ball, then rolls off to the side while that takes it lower. Two layers:
+    // the front, and a darker back layer showing in the gaps. Units: cup widths (x 0…1), y = fraction × ASPECT.
+    var PILE = [];
+    (function () {
+      var seed = 7;
+      var rnd = function () { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+      var FLOOR = 0.925 * ASPECT, TOPY = 0.37 * ASPECT;
+      var half = function (y) { return 0.5 - WALL(y / ASPECT); };               // inner half-width at that height
+      var layers = { front: [], back: [] };
+      function landY(list, r, x) {                                               // where a ball dropped at x comes to rest
+        var y = FLOOR - r, on = null;
+        list.forEach(function (p) {
+          var dx = x - p.x, rr = r + p.r;
+          if (Math.abs(dx) < rr) { var yc = p.y - Math.sqrt(rr * rr - dx * dx); if (yc < y) { y = yc; on = p; } }
+        });
+        return { y: y, on: on };
+      }
+      function inside(r, x, y) { var h = half(y) - r; return x >= 0.5 - h && x <= 0.5 + h; }
+      function settle(list, r, x) {
+        var l = landY(list, r, x);
+        for (var i = 0; i < 12 && !inside(r, x, l.y); i++) {                        // nudge it off the glass, the walls lean in
+          x += (x < 0.5 ? 1 : -1) * r * 0.25; l = landY(list, r, x);
+        }
+        if (!inside(r, x, l.y)) return null;
+        for (var pass = 0; pass < 80 && l.on; pass++) {                             // on a ball: roll off its side while that goes lower
+          var dir = x === l.on.x ? (rnd() < 0.5 ? -1 : 1) : Math.sign(x - l.on.x);
+          var nx = x + dir * r * 0.2, nl = landY(list, r, nx);
+          if (nl.y <= l.y + 0.001 || !inside(r, nx, nl.y)) break;                  // wedged: it stays
+          x = nx; l = nl;
+        }
+        return { x: x, y: l.y };
+      }
+      var guard = 0, front = layers.front;
+      while (guard++ < 500) {                                                    // the front layer: dropped and settled
+        var r = 0.1 * (0.94 + rnd() * 0.12), top = half(TOPY) - r, spot = null;
+        for (var t = 0; t < 16; t++) { var sp = settle(front, r, 0.5 + (rnd() * 2 - 1) * top); if (sp && (!spot || sp.y > spot.y)) spot = sp; }
+        if (!spot || spot.y - r < TOPY - r * 0.6) continue;
+        front.push({ x: spot.x, y: spot.y, r: r });
+        PILE.push({ x: spot.x, y: spot.y / ASPECT, d: 2 * r, back: false });
+      }
+      // the back layer: a ball in every gap of the front one, so the pile reads as full (and in shade, further back)
+      var back = layers.back, topF = Math.min.apply(null, front.map(function (p) { return p.y - p.r; }));
+      for (var gy = FLOOR - 0.07; gy > topF + 0.04; gy -= 0.02) {
+        var gh = half(gy) - 0.08;                                                     // keep it inside the glass
+        for (var gx = 0.5 - gh; gx <= 0.5 + gh; gx += 0.02) {
+          var x = gx + (rnd() - 0.5) * 0.01, y = gy + (rnd() - 0.5) * 0.01;
+          var gap = Math.min.apply(null, front.map(function (p) { return Math.hypot(x - p.x, y - p.y) - p.r; }));
+          var near = back.some(function (p) { return Math.hypot(x - p.x, y - p.y) < 0.075; });
+          if (gap > -0.01 && !near) {
+            var rb = 0.088 * (0.94 + rnd() * 0.12);
+            back.push({ x: x, y: y, r: rb });
+            PILE.push({ x: x, y: y / ASPECT, d: 2 * rb, back: true });
+          }
+        }
+      }
+      PILE.sort(function (a, b) { return b.y - a.y || (a.back ? -1 : 1); });   // they go in lowest first, back before front
+    })();
+    var R0 = 16.4, SPAN = 1.95, RS = SPAN / PILE.length;
     rain.forEach(function (el, k) {
-      var land = R0 + k * RS + 0.42;
-      var lvl = FILL_FROM - (FILL_FROM - FILL_TO) * (k + 1) / N;
-      var side = ((k * 7) % 5 - 2) / 2;               // -1 … 1, scattered
-      tl.fromTo(el,
-        { opacity: 1, x: function () { return pt(cup, 0.5 + side * 0.22, 0, {}).x; }, y: function () { return -H() * 0.12; }, rotation: k * 50, scale: 0.9 },
-        { y: function () { return pt(cup, 0.5, lvl / 100 + 0.01, {}).y; }, x: function () { return pt(cup, 0.5 + side * 0.28, 0, {}).x; }, rotation: k * 50 + 140, duration: 0.42, ease: 'power2.in', immediateRender: false }, R0 + k * RS)
-        .to(el, { opacity: 0, duration: 0.05 }, land)
-        .to(fill, { '--ct': lvl, duration: 0.14, ease: 'back.out(2.5)' }, land - 0.02);
-      if (k % 4 === 3) impact(cup, land, 0.25);
+      var c = PILE[k];
+      if (!c) { el.style.display = 'none'; return; }
+      el.classList.toggle('is-back', c.back);
+      el.style.zIndex = (c.back ? 0 : 100) + k;                                   // back layer always behind the front; later balls on top
+      var L = function (fx, fy) { var b = box(cup); return { x: fx * b.w, y: fy * b.h }; };   // inside the cup's own box
+      var size = function () { return box(cup).w * c.d; };
+      var fall = 0.36 + c.y * 0.16;                                                // further to fall to the bottom
+      var t0 = R0 + k * RS, land = t0 + fall;
+      var spin = (c.x < 0.5 ? -1 : 1) * (180 + (k * 37) % 140), rest = (k * 53) % 360;
+      tl.set(el, { width: size }, t0)
+        .fromTo(el,
+          { opacity: 1, x: function () { return L(0.5 + (c.x - 0.5) * 0.55, 0).x; }, y: function () { return -box(cup).h * 0.35; }, rotation: rest - spin },
+          { x: function () { return L(c.x, c.y).x; }, y: function () { return L(c.x, c.y).y; }, rotation: rest, duration: fall, ease: 'power2.in', immediateRender: false }, t0)
+        // a small bounce where it lands, then it stays: it is the pile
+        .to(el, { y: function () { return L(c.x, c.y).y - size() * 0.12; }, duration: 0.08, ease: 'power2.out' }, land)
+        .to(el, { y: function () { return L(c.x, c.y).y; }, duration: 0.1, ease: 'power2.in' }, land + 0.08);
+      if (k % 8 === 7) impact(cup, land, 0.22);
     });
 
     /* 07 — the empty double-dip insert lowers into the rim, then milk & white chocolate pour in */
@@ -596,18 +767,67 @@
     tl.fromTo(ins, { opacity: 1, y: function () { return -H() * 0.35; }, rotation: -4 },
       { y: 0, rotation: 0, duration: 0.6, ease: 'power3.in', immediateRender: false }, 18.55);
     impact(cup, 19.15, 0.5);
-    function pour(el, varName, t0) {
-      tl.set(el, { transformOrigin: '50% 0%' }, t0)
-        .fromTo(el, { opacity: 1, scaleY: 0 }, { scaleY: 1, duration: 0.2, ease: 'power2.in', immediateRender: false }, t0);
-      var v = {}; v[varName] = INS_TOP;
-      var f = {}; f[varName] = INS_BOT;
-      tl.fromTo(varName === '--fl' ? insL : insR, f, Object.assign(v, { duration: 0.65, ease: 'power1.out', immediateRender: false }), t0 + 0.15);
-      tl.set(el, { transformOrigin: '50% 100%' }, t0 + 0.8)
-        .to(el, { scaleY: 0, duration: 0.18, ease: 'power2.in' }, t0 + 0.8)
-        .set(el, { opacity: 0 }, t0 + 0.99);
+    // melted chocolate: a wobbling stream that thins as it falls and swells where it lands, ripples on the surface,
+    // the photographed sauce uncovered as the level rises with a wavy, curved (seen-from-above) edge, then the tail
+    // falls in and the surface settles. In % of the cup picture (the SVG and the sauce picture share its box).
+    // Measured from the sauce picture: its liquid runs from 33% (bottom) up to 14% (rim); the surfaces' centres are
+    // at about 29% / 69% across, 20% down.
+    var SAUCE_BOT = 33.5, SAUCE_TOP = INS_TOP, SURF_C = 19.8;
+    function pour(g, img, x0, x1, C, t0) {
+      var cx = C.cx, hw = C.hw, sx = C.sx;
+      var st = { lvl: SAUCE_BOT, head: -45, tail: -45, contact: 0, mound: 0, amp: 0, ph: 0, rip: 0, on: 0 };
+      var stream = g.querySelector('.stream'), gloss = g.querySelector('.gloss'), rips = g.querySelectorAll('.rip');
+      function surfY(x) {
+        var u = Math.max(-1, Math.min(1, (x - cx) / hw)), rising = Math.min(1, (SAUCE_BOT - st.lvl) / 3);
+        return st.lvl + 1.8 * (1 - u * u) * rising * (st.lvl > SAUCE_TOP + 0.3 ? 1 : 0)
+          + st.amp * Math.sin(x * 0.5 + st.ph) * rising
+          - st.mound * 2.4 * Math.exp(-Math.pow((x - sx) / 4.5, 2));
+      }
+      // where the stream meets the sauce: on the rising level, easing into the middle of the surface once it is full
+      function landY() {
+        var full = Math.max(0, Math.min(1, (SAUCE_BOT - st.lvl) / (SAUCE_BOT - SAUCE_TOP)));
+        return surfY(sx) + (SURF_C - SAUCE_TOP) * full * full;
+      }
+      function ribbon(w0, w1, off) {
+        var bottom = Math.min(st.head, landY()), top = Math.min(st.tail, bottom), L = [], R = [], n = 16;
+        if (bottom - top < 0.2) return '';
+        for (var i = 0; i <= n; i++) {
+          var y = top + (bottom - top) * i / n, t = (y + 45) / (bottom + 45 || 1);
+          var w = w0 + (w1 - w0) * t + st.contact * 1.6 * Math.exp(-Math.pow((bottom - y) / 2.2, 2));
+          var x = sx + off + 0.7 * Math.sin(y * 0.22 + st.ph * 1.4) * t;
+          L.push((x - w / 2).toFixed(2) + ',' + y.toFixed(2)); R.unshift((x + w / 2).toFixed(2) + ',' + y.toFixed(2));
+        }
+        return 'M' + L.join(' L') + ' L' + R.join(' L') + 'Z';
+      }
+      function render() {
+        var pts = [];
+        for (var i = 0; i <= 30; i++) { var x = x0 + (x1 - x0) * i / 30; pts.push(x.toFixed(2) + '% ' + surfY(x).toFixed(2) + '%'); }
+        // nothing of the sauce picture shows until the stream reaches it (before that the insert may not even be there)
+        img.style.clipPath = st.on <= 0 && st.lvl >= SAUCE_BOT - 0.01 ? 'inset(100% 0 0 0)'
+          : 'polygon(' + pts.join(',') + ',' + x1 + '% 100%,' + x0 + '% 100%)';
+        stream.setAttribute('d', ribbon(3.4, 2.3, 0));
+        gloss.setAttribute('d', ribbon(0.7, 0.45, -0.55));
+        var sy = landY();
+        [0, 0.5].forEach(function (o, k) {
+          var f = (st.rip + o) % 1, rx = 1.5 + 9 * f;
+          rips[k].setAttribute('cx', sx); rips[k].setAttribute('cy', sy + 0.4);
+          rips[k].setAttribute('rx', rx); rips[k].setAttribute('ry', rx * 0.22);
+          rips[k].style.opacity = (1 - f) * st.on * 0.8;
+        });
+      }
+      tl.set(g, { opacity: 1 }, t0)
+        .fromTo(st, { head: -45, tail: -45 }, { head: 60, duration: 0.24, ease: 'power2.in', immediateRender: false, onUpdate: render }, t0)
+        .fromTo(st, { contact: 0, mound: 0, amp: 0, on: 0 }, { contact: 1, mound: 1, amp: 0.7, on: 1, duration: 0.14, ease: 'power2.out', immediateRender: false, onUpdate: render }, t0 + 0.2)
+        .fromTo(st, { lvl: SAUCE_BOT }, { lvl: SAUCE_TOP, duration: 0.66, ease: 'power1.out', immediateRender: false, onUpdate: render }, t0 + 0.2)
+        .fromTo(st, { ph: 0, rip: 0 }, { ph: 16, rip: 4, duration: 1.6, ease: 'none', immediateRender: false, onUpdate: render }, t0)
+        .to(st, { tail: 60, duration: 0.24, ease: 'power2.in', onUpdate: render }, t0 + 0.82)
+        .to(st, { contact: 0, on: 0, duration: 0.35, ease: 'power1.in', onUpdate: render }, t0 + 0.98)
+        .to(st, { mound: 0, amp: 0, duration: 0.7, ease: 'elastic.out(1, 0.35)', onUpdate: render }, t0 + 0.98)
+        .set(g, { opacity: 0 }, t0 + 1.7);
+      render();
     }
-    pour(pourL, '--fl', 19.35);
-    pour(pourR, '--fr', 19.75);
+    pour(pourL, insL, 0, 48.4, { cx: 29.5, hw: 17, sx: 29.5 }, 19.35);
+    pour(pourR, insR, 51.6, 100, { cx: 69.5, hw: 17, sx: 69.5 }, 19.75);
 
     /* 08 — the dome snaps on, then the logo stamps on with a pop */
     panelIn(7, 20.6);
@@ -658,6 +878,441 @@
   }
 
   /* ======================================================================
+     Hero "Pop!" — every ingredient is a real object. The cup slams onto the
+     floor and a shockwave runs out from it: the pieces round the landing
+     spot splash up and keep floating; the cookies, chips, crumbs and the dip
+     bowl further out jump (the closer, the higher) and settle again.
+     Air spots: fractions of the scene. Ground starts: cup-heights from the
+     cup's centre / top. Floor objects: pixels of the 1376×768 poster photo,
+     so they sit where they were photographed.
+     ====================================================================== */
+  function heroPop(gsap, ST, intro, landAt) {
+    var scene = document.querySelector('.hero-scene');
+    var cup = scene && scene.querySelector('.hero-cup');
+    var back = scene && scene.querySelector('.pop-back');
+    var front = scene && scene.querySelector('.pop-front');
+    var ground = scene && scene.querySelector('.pop-floor');      // under the text's wash, like the photo was
+    if (!cup || !back || !front || !ground) return;
+    var cupTurn = cup.querySelector('.cup-turn');
+    var plate = scene.querySelector('.hero-plate');
+    var SRC = 'assets/transparent/seq/';
+    var fine = window.matchMedia('(pointer: fine)').matches;
+    var rnd = function (a, b) { return a + Math.random() * (b - a); };
+    var IMG_W = 1376, IMG_H = 768;
+
+    var SPOTS = [
+      // air: fx, fy, size (× scene height), layer, blur, sprite, mobile, ground: gx, gy
+      [0.25, 0.11, 0.050, 'b', 1,   'p-golden-2', 0,  -0.30, 0.92],
+      [0.07, 0.30, 0.062, 'b', 1.5, 'p-golden-4', 1,  -0.42, 0.93],
+      [0.03, 0.58, 0.052, 'b', 2,   'p-cacao-4',  0,  -0.46, 0.91],
+      [0.40, 0.11, 0.030, 'b', 0.5, 'p-chip-2',   0,  -0.18, 0.94],
+      [0.80, 0.44, 0.070, 'b', 0,   'p-cacao-1',  1,   0.26, 0.92],
+      [0.88, 0.15, 0.036, 'b', 0,   'p-chip-4',   1,   0.36, 0.91],
+      [0.975,0.38, 0.062, 'b', 0.5, 'p-golden-3', 1,   0.44, 0.92],
+      [0.535,0.30, 0.032, 'b', 0,   'p-chip-1',   0,  -0.10, 0.93],
+      [0.93, 0.62, 0.110, 'f', 0,   'p-golden-1', 1,   0.30, 1.04],
+      [0.50, 0.85, 0.070, 'f', 2,   'p-cacao-2',  0,  -0.30, 1.05],
+      [0.515,0.10, 0.056, 'f', 0,   'p-golden-3', 1,  -0.08, 1.06],
+      [0.63, 0.12, 0.034, 'f', 0,   'p-chip-1',   1,   0.10, 1.07],
+      [0.86, 0.80, 0.040, 'f', 0,   'p-chip-3',   1,   0.20, 1.06],
+      [0.985,0.12, 0.050, 'f', 1,   'p-cacao-3',  0,   0.42, 1.03],
+      [0.505,0.55, 0.048, 'f', 0,   'p-golden-4', 0,  -0.22, 1.04],
+      [0.78, 0.90, 0.034, 'f', 0,   'p-chip-2',   1,   0.04, 1.07]
+    ];
+    // on the floor, as photographed: x, y (ground contact), diameter, sprite
+    var FLOOR = [
+      [340, 610, 76, 'p-golden-3'], [340, 733, 90, 'p-golden-1'], [125, 690, 58, 'p-golden-4'],
+      [1298, 738, 96, 'p-golden-2'], [180, 700, 28, 'p-golden-3'], [1182, 706, 30, 'p-golden-4'],
+      [45, 602, 24, 'p-chip-1'], [18, 622, 22, 'p-chip-2'], [70, 663, 24, 'p-chip-3'], [340, 637, 22, 'p-chip-4'],
+      [390, 633, 22, 'p-chip-1'], [78, 727, 26, 'p-chip-2'], [262, 739, 26, 'p-chip-3'], [398, 746, 24, 'p-chip-4'],
+      [460, 703, 22, 'p-chip-1'], [706, 723, 26, 'p-chip-2'], [1167, 580, 22, 'p-chip-3'], [1224, 620, 24, 'p-chip-4'],
+      [1347, 630, 24, 'p-chip-1'], [1061, 739, 26, 'p-chip-2']
+    ];
+    var CRUMBS = [
+      [1213,725,17],[573,710,16],[378,574,14],[204,720,15],[1272,594,13],[231,692,12],[1143,692,12],[19,641,11],
+      [63,621,10],[1199,748,9],[1234,654,9],[48,666,9],[701,726,9],[144,691,8],[192,739,8],[217,708,8],[663,683,7],
+      [1138,718,7],[40,634,7],[601,695,7],[8,664,7],[1207,716,7],[160,718,6],[140,714,6],[289,720,6],[436,689,5],
+      [1354,683,5],[1116,714,5],[1170,714,5],[520,730,6],[820,742,7],[960,736,6],[1010,712,5]
+    ];
+    var BOWL = { x: 59, y: 503, w: 243, h: 195, contact: 651 };   // dip-bowl.webp, in photo pixels
+    var BADGE = [-0.5, 0.22, 0.19];
+
+    var mk = function (tag, cls, parent) { var e = document.createElement(tag); e.className = cls; parent.appendChild(e); return e; };
+
+    // --- floating pieces (start on the ground round the landing spot)
+    var balls = SPOTS.map(function (s) {
+      var layer = s[3] === 'f' ? front : back;
+      var sh = mk('span', 'pb-sh', layer);
+      var el = mk('div', 'pb', layer);
+      // .pb: flight · .pb-r: dodges the cursor · .pb-k: knocked by a click · img: floats
+      el.innerHTML = '<div class="pb-r"><div class="pb-k"><img src="' + SRC + s[5] + '.webp" alt="" decoding="async" draggable="false"></div></div>';
+      var img = el.querySelector('img');
+      if (s[4]) img.style.filter = 'blur(' + s[4] + 'px) drop-shadow(0 12px 10px rgba(110, 52, 20, .28))';
+      el.style.setProperty('--d', s[3] === 'f' ? 1.3 : 0.55);
+      return { el: el, sh: sh, r: el.firstChild, k: el.firstChild.firstChild, img: img, s: s, hx: 0, hy: 0, gx: 0, gy: 0, sz: 0, on: true,
+               qx: gsap.quickTo(el.firstChild, 'x', { duration: 0.7, ease: 'power3' }),
+               qy: gsap.quickTo(el.firstChild, 'y', { duration: 0.7, ease: 'power3' }) };
+    });
+
+    // --- the floor: cookies, chips, crumbs and the dip bowl, where the photo had them
+    var floorShadow = mk('span', 'cup-shadow', ground);
+    var bowl = { sh: mk('span', 'pb-sh', ground), el: mk('div', 'pop-bowl', ground) };
+    bowl.el.innerHTML = '<img src="assets/transparent/hero/dip-bowl.webp" alt="" decoding="async" draggable="false">';
+    bowl.img = bowl.el.firstChild;
+    var drops = [0, 1, 2, 3, 4, 5, 6].map(function () { return mk('span', 'pop-drop', ground); });
+    var floor = FLOOR.map(function (f) {
+      var sh = mk('span', 'pb-sh', ground);
+      var el = mk('div', 'pb pb-floor', ground);
+      el.innerHTML = '<div class="pb-k"><img src="' + SRC + f[3] + '.webp" alt="" decoding="async" draggable="false"></div>';
+      gsap.set(el.firstChild, { rotation: rnd(-40, 40) });
+      return { el: el, sh: sh, k: el.firstChild, f: f, x: 0, y: 0, sz: 0, off: 0 };
+    });
+    var crumbs = CRUMBS.map(function (c, i) {
+      var el = mk('span', 'pop-crumb' + (i % 3 === 0 ? ' is-dark' : ''), ground);
+      gsap.set(el, { rotation: rnd(0, 90) });
+      return { el: el, c: c, x: 0, y: 0, sz: 0, off: 0 };
+    });
+
+    var badge = mk('div', 'pb pop-badge', front);
+    badge.style.setProperty('--d', 0.9);
+    badge.innerHTML = '<svg viewBox="0 0 200 200"><defs><path id="pop-ring" d="M100,100 m-74,0 a74,74 0 1,1 148,0 a74,74 0 1,1 -148,0"/></defs>' +
+      '<circle class="bg" cx="100" cy="100" r="99"/><circle class="ring" cx="100" cy="100" r="56"/>' +
+      '<text><textPath href="#pop-ring"></textPath></text></svg>' +
+      '<img src="' + SRC + 'p-golden-2.webp" alt="" decoding="async" draggable="false">';
+    var badgeRing = badge.querySelector('svg'), badgeCookie = badge.querySelector('img'), badgePath = badge.querySelector('textPath');
+    // the slogan round the badge: Latin letters spaced to fill the ring; Arabic keeps its natural spacing so the letters stay joined
+    function badgeText() {
+      var ar = root.lang === 'ar';
+      badgePath.textContent = ar ? 'غمّس • اقضم • كرّر • غمّس • اقضم • كرّر • ' : 'DIP • BITE • REPEAT • DIP • BITE • REPEAT • ';
+      // right-to-left text runs back from where it starts, so start it at the end of the circle
+      var text = badgePath.parentNode;
+      text.style.wordSpacing = '';
+      if (ar) {
+        badgePath.removeAttribute('textLength'); badgePath.removeAttribute('lengthAdjust'); badgePath.setAttribute('startOffset', '100%');
+        // share the room left on the circle equally between the word gaps, so the words sit evenly round the ring
+        text.style.wordSpacing = '0px';
+        var ring = badge.querySelector('#pop-ring').getTotalLength(), used = text.getComputedTextLength();
+        var gaps = (badgePath.textContent.match(/ /g) || []).length;
+        if (used > 0 && gaps) text.style.wordSpacing = Math.max(0, (ring - used) / gaps).toFixed(2) + 'px';
+      } else { badgePath.setAttribute('textLength', '462'); badgePath.setAttribute('lengthAdjust', 'spacing'); badgePath.removeAttribute('startOffset'); }
+    }
+    badgeText();
+    // re-measure once the Arabic font has arrived (it only downloads when Arabic text is on the page)
+    if (document.fonts && document.fonts.load) document.fonts.load('800 23px "Baloo Bhaijaan 2"', 'غمّس').then(badgeText, function () {});
+    if (document.fonts && document.fonts.addEventListener) document.fonts.addEventListener('loadingdone', badgeText);
+    new MutationObserver(badgeText).observe(root, { attributes: true, attributeFilter: ['lang'] });
+    var word = mk('span', 'pop-word', front);
+    // "Double chocolate dip": the note sits beside the cup's top and its arrow is drawn to the lid, in every layout
+    var note = scene.querySelector('.note--dip'), noteArrow = null;
+    if (note) {
+      var oldArrow = note.querySelector('svg'); if (oldArrow) oldArrow.style.display = 'none';
+      noteArrow = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      noteArrow.setAttribute('class', 'note-arrow'); noteArrow.setAttribute('aria-hidden', 'true');
+      noteArrow.innerHTML = '<path class="curve" pathLength="1"/><path class="head" pathLength="1"/>';
+      front.appendChild(noteArrow);
+      note.classList.add('is-placed');
+    }
+    word.textContent = 'POP!';
+    var rings = [0, 1].map(function () { return mk('span', 'pop-ring', ground); });
+    var dust = mk('span', 'pop-dust', ground);
+    // rings and dust lie on the floor, under everything else in the layer
+    rings.concat(dust, floorShadow).forEach(function (e) { ground.insertBefore(e, ground.firstChild); });
+
+    var geo = { cx: 0, top: 0, h: 1, dir: 1, base: 0, W: 1, narrow: false };
+    function px(el, x, y) { el.style.left = x.toFixed(1) + 'px'; el.style.top = y.toFixed(1) + 'px'; }
+    function shadowAt(sh, x, y, size) {
+      px(sh, x, y); sh.style.width = (size * 0.95).toFixed(1) + 'px'; sh.style.height = (size * 0.24).toFixed(1) + 'px';
+    }
+    function layout() {
+      var W = scene.offsetWidth, SH = scene.offsetHeight, H = cup.offsetHeight || 1;
+      var narrow = W < 920;
+      // the cup box is centred on its offsetLeft (translate: -50%); its picture's base is at 97.4%
+      geo = { cx: cup.offsetLeft, top: cup.offsetTop, h: H, dir: root.dir === 'rtl' ? -1 : 1, base: cup.offsetTop + 0.965 * H, W: W, narrow: narrow };
+      // phones: the cup fills most of the width, so keep the ground spots in the strips beside it
+      var half = 0.302 * H, room = Math.max(0, W / 2 - half * 0.9 - 14);
+      var X = narrow
+        ? function (ox) { return geo.cx + geo.dir * (ox < 0 ? -1 : 1) * (half * 0.9 + Math.min(1, Math.abs(ox) / 0.82) * room); }
+        : function (ox) { return geo.cx + geo.dir * ox * H; };
+      var FX = function (fx) { return (geo.dir < 0 ? 1 - fx : fx) * W; };
+      // the photo is object-fit: cover, anchored bottom (50% / 62% on phones), mirrored in Arabic on desktop
+      var s = Math.max(W / IMG_W, SH / IMG_H), offX = (W - IMG_W * s) * (narrow ? 0.62 : 0.5), offY = SH - IMG_H * s;
+      var mirror = geo.dir < 0 && !narrow;
+      var P = function (x, y) { var sx = offX + x * s; return { x: mirror ? W - sx : sx, y: offY + y * s }; };
+      geo.s = s;
+
+      var side = 0;
+      balls.forEach(function (b) {
+        b.on = !narrow || !!b.s[6];
+        b.el.style.display = b.sh.style.display = b.on ? '' : 'none';
+        if (narrow) {   // the copy is above the cup on phones: spread across the width, in the cup's band
+          var fx = b.s[0] < 0.5 ? b.s[0] : (b.on && side++ % 2 ? 1 - b.s[0] : b.s[0]);   // balance left / right
+          b.hx = Math.min(W - 16, Math.max(16, FX(fx)));
+          b.hy = geo.top + (b.s[1] * 1.05 - 0.04) * H;
+          b.sz = b.s[2] * H * 1.6;
+        } else {
+          b.hx = FX(b.s[0]); b.hy = b.s[1] * SH; b.sz = b.s[2] * SH;
+        }
+        b.gx = X(b.s[7]); b.gy = geo.top + b.s[8] * H - b.sz * 0.3;   // resting on the ground (drawn smaller there)
+        px(b.el, b.hx, b.hy); b.el.style.setProperty('--s', b.sz.toFixed(1) + 'px');
+        shadowAt(b.sh, b.gx, b.gy + b.sz * 0.3, b.sz * 0.6);
+      });
+      floor.forEach(function (o) {
+        var p = P(o.f[0], o.f[1]); o.sz = o.f[2] * s; o.x = p.x; o.y = p.y;
+        px(o.el, o.x, o.y - o.sz * 0.45); o.el.style.setProperty('--s', o.sz.toFixed(1) + 'px');
+        shadowAt(o.sh, o.x, o.y, o.sz);
+      });
+      crumbs.forEach(function (c) {
+        var p = P(c.c[0], c.c[1]); c.sz = c.c[2] * s * 0.8; c.x = p.x; c.y = p.y;
+        px(c.el, c.x, c.y - c.sz / 2); c.el.style.width = c.el.style.height = c.sz.toFixed(1) + 'px';
+      });
+      var bp = P(BOWL.x + BOWL.w / 2, BOWL.contact);
+      bowl.x = bp.x; bowl.y = bp.y; bowl.w = BOWL.w * s; bowl.h = BOWL.h * s;
+      px(bowl.el, bowl.x, bowl.y); bowl.el.style.width = bowl.w.toFixed(1) + 'px';
+      bowl.el.style.marginTop = (-(BOWL.contact - BOWL.y) * s).toFixed(1) + 'px';
+      bowl.el.style.transform = mirror ? 'scaleX(-1)' : '';
+      shadowAt(bowl.sh, bowl.x, bowl.y, bowl.w * 0.85);
+
+      var bs = BADGE[2] * H * (narrow ? 0.85 : 1);
+      badge.bx = Math.min(W - bs / 2 - 8, Math.max(bs / 2 + 8, X(BADGE[0]))); badge.by = geo.top + BADGE[1] * H;
+      badge.gx = X(-0.12); badge.gy = geo.top + 1.03 * H - bs * 0.23;   // where its cookie lies before the slam
+      px(badge, badge.bx, badge.by);
+      badge.style.setProperty('--s', bs.toFixed(1) + 'px');
+      px(word, X(-0.3), geo.top + 0.04 * H); word.style.setProperty('--fs', (0.1 * H).toFixed(1) + 'px');
+      if (note) placeNote(W, SH, H);
+      rings.concat(dust).forEach(function (e) {
+        px(e, geo.cx, geo.base); e.style.width = (0.62 * H).toFixed(1) + 'px'; e.style.height = (0.13 * H).toFixed(1) + 'px';
+      });
+      px(floorShadow, geo.cx, geo.base);
+      floorShadow.style.width = (0.8 * H).toFixed(1) + 'px'; floorShadow.style.height = (0.14 * H).toFixed(1) + 'px';
+    }
+    function placeNote(W, SH, H) {
+      var d = geo.dir;
+      // the text's inner edge, just clear of the cup's widest point (≈ 0.29 cup-heights from its centre)
+      var tx = geo.cx + d * 0.37 * H, ty = geo.top + 0.15 * H;
+      note.style.maxWidth = Math.max(90, Math.min(200, d > 0 ? W - tx - 12 : tx - 12)).toFixed(0) + 'px';
+      px(note, tx, ty); note.style.translate = d < 0 ? '-100% 0' : '0 0';
+      noteArrow.style.display = getComputedStyle(note).display === 'none' ? 'none' : '';
+      noteArrow.setAttribute('width', W); noteArrow.setAttribute('height', SH);
+      noteArrow.setAttribute('viewBox', '0 0 ' + W + ' ' + SH);
+      // from the top of the text, an arc up and over, coming down onto the lid (over the dips)
+      var sx = tx + d * note.offsetWidth * 0.4, sy = ty - 6;
+      var ex = geo.cx + d * 0.2 * H, ey = geo.top + 0.09 * H;
+      var c1x = sx - d * 0.01 * H, c1y = sy - 0.1 * H, c2x = ex + d * 0.09 * H, c2y = ey - 0.1 * H;
+      noteArrow.querySelector('.curve').setAttribute('d', 'M' + sx.toFixed(1) + ',' + sy.toFixed(1) + ' C' + c1x.toFixed(1) + ',' + c1y.toFixed(1) + ' ' + c2x.toFixed(1) + ',' + c2y.toFixed(1) + ' ' + ex.toFixed(1) + ',' + ey.toFixed(1));
+      var ang = Math.atan2(ey - c2y, ex - c2x), L = Math.max(9, 0.018 * H), spread = 0.5;
+      var h1x = ex - L * Math.cos(ang - spread), h1y = ey - L * Math.sin(ang - spread);
+      var h2x = ex - L * Math.cos(ang + spread), h2y = ey - L * Math.sin(ang + spread);
+      noteArrow.querySelector('.head').setAttribute('d', 'M' + h1x.toFixed(1) + ',' + h1y.toFixed(1) + ' L' + ex.toFixed(1) + ',' + ey.toFixed(1) + ' L' + h2x.toFixed(1) + ',' + h2y.toFixed(1));
+    }
+    layout();
+    if ('ResizeObserver' in window) new ResizeObserver(layout).observe(scene);
+    new MutationObserver(layout).observe(root, { attributes: true, attributeFilter: ['dir', 'lang'] });   // the note's text changes width
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
+
+    // --- before the slam: the floating pieces lie on the ground round the landing spot
+    balls.forEach(function (b) {
+      gsap.set(b.el, { x: b.gx - b.hx, y: b.gy - b.hy, scale: 0.6, rotation: rnd(-30, 30) });
+    });
+    // the badge's cookie lies on the ground with the others; its ring only opens once the cookie arrives
+    gsap.set(badgeRing, { scale: 0, rotation: -90, opacity: 0 });
+    gsap.set(badgeCookie, { x: badge.gx - badge.bx, y: badge.gy - badge.by, scale: 0.6, rotation: rnd(-30, 30) });
+
+    // how hard the shockwave hits a point on the floor, and when it gets there
+    function wave(x, y) {
+      var d = Math.hypot(x - geo.cx, (y - geo.base) * 2.2);
+      return { delay: d / 1700, amp: Math.max(0.12, Math.min(1, 1 - d / (geo.W * 0.85))) };
+    }
+
+    // --- splash: thrown up and out from the ground, spinning, into the air spot
+    function splash() {
+      balls.forEach(function (b) {
+        if (!b.on) return;
+        var dist = Math.hypot(b.hx - b.gx, b.hy - b.gy);
+        var near = Math.max(0.35, 1.1 - Math.abs(b.s[7]) * 1.4);
+        var d = 0.85 + Math.min(1, dist / 1100) * 0.75 + rnd(0, 0.2);
+        var peak = Math.min(b.gy - b.hy, 0) - geo.h * rnd(0.10, 0.22) * near;
+        var delay = Math.abs(b.s[7]) * 0.12;
+        gsap.timeline({ delay: delay })
+          .to(b.el, { x: 0, scale: 1, rotation: rnd(-25, 25) + rnd(300, 620) * (b.hx < geo.cx ? -1 : 1), duration: d, ease: 'power2.out' }, 0)
+          .to(b.el, { y: peak, duration: d * 0.4, ease: 'power2.out' }, 0)
+          .to(b.el, { y: 0, duration: d * 0.6, ease: 'back.out(1.3)' }, d * 0.4)
+          .to(b.sh, { scale: 0.3, opacity: 0, duration: d * 0.5, ease: 'power2.out' }, 0);
+        if (b.s[3] === 'f') gsap.fromTo(b.k, { scale: 1 }, { scale: 1.18, duration: d * 0.38, ease: 'power2.out', yoyo: true, repeat: 1, delay: delay });
+      });
+      // the badge cookie flies up into place, then the slogan ring opens round it
+      var bd = 1.05, bpeak = Math.min(badge.gy - badge.by, 0) - geo.h * 0.12;
+      gsap.timeline({ delay: 0.12 })
+        .to(badgeCookie, { x: 0, scale: 1, rotation: 360 * geo.dir, duration: bd, ease: 'power2.out' }, 0)
+        .to(badgeCookie, { y: bpeak, duration: bd * 0.42, ease: 'power2.out' }, 0)
+        .to(badgeCookie, { y: 0, duration: bd * 0.58, ease: 'back.out(1.6)' }, bd * 0.42)
+        .to(badgeRing, { scale: 1, rotation: 0, opacity: 1, duration: 0.8, ease: 'back.out(1.8)' }, bd * 0.85);
+    }
+
+    // --- a piece on the floor jumps, spins, lands and bounces; its shadow follows
+    function hop(o, power, light) {
+      var w = wave(o.x, o.y), a = w.amp * power;
+      var h = geo.h * (light ? 0.05 + 0.16 * a * a : 0.06 + 0.32 * a * a) * rnd(0.8, 1.2);
+      var up = 0.22 + 0.26 * a, out = (o.x < geo.cx ? -1 : 1) * a * rnd(20, 60) * (light ? 1.6 : 1);
+      o.off = Math.max(-geo.W * 0.08, Math.min(geo.W * 0.08, o.off + out));
+      var tl = gsap.timeline({ delay: w.delay });
+      tl.to(o.el, { x: o.off, duration: up * 2.4, ease: 'power2.out' }, 0)
+        .to(o.k || o.el, { y: -h, duration: up, ease: 'power2.out' }, 0)
+        .to(o.k || o.el, { y: 0, duration: up, ease: 'power2.in' }, up)
+        .to(o.k || o.el, { y: -h * 0.18, duration: up * 0.4, ease: 'power2.out' }, up * 2)
+        .to(o.k || o.el, { y: 0, duration: up * 0.4, ease: 'power2.in' }, up * 2.4)
+        .to(o.k || o.el, { rotation: '+=' + (rnd(120, 360) * a * (o.x < geo.cx ? -1 : 1)), duration: up * 2.8, ease: 'power2.out' }, 0);
+      if (o.sh) tl.to(o.sh, { x: o.off, duration: up * 2.4, ease: 'power2.out' }, 0)
+        .to(o.sh, { scale: 0.45, opacity: 0.35, duration: up, ease: 'power2.out' }, 0)
+        .to(o.sh, { scale: 1, opacity: 1, duration: up, ease: 'power2.in' }, up);
+    }
+
+    // --- the dip bowl: heavy, so a short jump, a squash on landing, and the chocolate splashes
+    function bowlHop(power) {
+      var w = wave(bowl.x, bowl.y), a = w.amp * power;
+      var h = geo.h * (0.03 + 0.1 * a), up = 0.2 + 0.12 * a, tilt = rnd(4, 9) * (bowl.x < geo.cx ? -1 : 1);
+      gsap.timeline({ delay: w.delay })
+        .to(bowl.img, { y: -h, rotation: tilt, scaleY: 1.05, scaleX: 0.97, duration: up, ease: 'power2.out' }, 0)
+        .to(bowl.img, { y: 0, rotation: 0, scaleY: 1, scaleX: 1, duration: up, ease: 'power2.in' }, up)
+        .to(bowl.img, { scaleY: 0.9, scaleX: 1.06, duration: 0.07, ease: 'power2.out' }, up * 2)
+        .to(bowl.img, { scaleY: 1, scaleX: 1, duration: 0.8, ease: 'elastic.out(1, 0.35)' }, up * 2 + 0.07)
+        .to(bowl.sh, { scale: 0.7, opacity: 0.5, duration: up, ease: 'power2.out' }, 0)
+        .to(bowl.sh, { scale: 1, opacity: 1, duration: up, ease: 'power2.in' }, up)
+        .add(function () { chocolateSplash(a); }, up * 2);
+    }
+    function chocolateSplash(a) {
+      var rimY = bowl.y - bowl.h * 0.72, sz = bowl.w * 0.05;
+      drops.forEach(function (d) {
+        var s = sz * rnd(0.5, 1.2), dx = rnd(-0.45, 0.45) * bowl.w * (0.6 + a), peak = geo.h * rnd(0.06, 0.16) * (0.5 + a);
+        var land = rnd(0, 1) < 0.5 ? rimY + bowl.h * 0.05 : bowl.y - s * 0.3;    // back in the bowl, or on the floor
+        var t = rnd(0.45, 0.7);
+        d.style.width = d.style.height = s.toFixed(1) + 'px';
+        gsap.timeline()
+          .set(d, { left: bowl.x + rnd(-0.25, 0.25) * bowl.w, top: rimY, x: 0, y: 0, opacity: 1, scaleX: 0.8, scaleY: 1.3 })
+          .to(d, { x: dx, duration: t * 2, ease: 'none' }, 0)
+          .to(d, { y: -peak, scaleX: 1, scaleY: 1, duration: t, ease: 'power2.out' }, 0)
+          .to(d, { y: land - rimY, duration: t, ease: 'power2.in' }, t)
+          .to(d, { scaleX: 1.8, scaleY: 0.4, duration: 0.12, ease: 'power2.out' }, t * 2)
+          .to(d, { opacity: 0, duration: 0.6, ease: 'power1.in' }, t * 2 + 0.3);
+      });
+    }
+
+    function impact(power) {
+      gsap.timeline()
+        .to(cupTurn, { scaleY: 1 - 0.22 * power, scaleX: 1 + 0.14 * power, duration: 0.08, ease: 'power3.out' })
+        .to(cupTurn, { scaleY: 1, scaleX: 1, duration: 1.1, ease: 'elastic.out(1.1, 0.3)' });
+      gsap.timeline()
+        .to(floorShadow, { scaleX: 1 + 0.12 * power, duration: 0.08, ease: 'power3.out' })
+        .to(floorShadow, { scaleX: 1, duration: 1.1, ease: 'elastic.out(1.1, 0.3)' });
+      // shake the world, not the words
+      var shake = [plate, ground, back, front].filter(Boolean), amp = 9 * power;
+      gsap.timeline()
+        .to(shake, { x: rnd(-1, 1) * amp, y: amp, duration: 0.05, ease: 'none' })
+        .to(shake, { x: rnd(-1, 1) * amp * 0.6, y: -amp * 0.5, duration: 0.06, ease: 'none' })
+        .to(shake, { x: rnd(-1, 1) * amp * 0.3, y: amp * 0.25, duration: 0.07, ease: 'none' })
+        .to(shake, { x: 0, y: 0, duration: 0.25, ease: 'power2.out' });
+      rings.forEach(function (r, i) {
+        gsap.fromTo(r, { scale: 0.3, opacity: 0.7 * power }, { scale: 2.6 + i * 1.4, opacity: 0, duration: 0.9 + i * 0.35, ease: 'power2.out', delay: i * 0.08 });
+      });
+      gsap.fromTo(dust, { scale: 0.4, opacity: 0.9 * power }, { scale: 2.2, opacity: 0, duration: 0.8, ease: 'power2.out' });
+      floor.forEach(function (o) { hop(o, power, false); });
+      crumbs.forEach(function (c) { hop(c, power, true); });
+      bowlHop(power);
+      popWord();
+    }
+
+    function popWord() {
+      gsap.killTweensOf(word);
+      gsap.timeline()
+        .fromTo(word, { opacity: 1, scale: 0.2, rotation: geo.dir * -24, y: 10 },
+                      { scale: 1, rotation: geo.dir * -8, y: 0, duration: 0.45, ease: 'back.out(3)' })
+        .to(word, { opacity: 0, y: -36, scale: 1.1, duration: 0.45, ease: 'power2.in' }, 0.75);
+    }
+
+    // --- the floating pieces keep floating, each at its own pace
+    var floats = balls.map(function (b) {
+      var depth = b.s[3] === 'f' ? 1 : 0.6;
+      return gsap.to(b.img, { y: rnd(8, 18) * depth * (Math.random() < 0.5 ? -1 : 1), rotation: rnd(-14, 14),
+        duration: rnd(2.4, 4.2), ease: 'sine.inOut', yoyo: true, repeat: -1, delay: -rnd(0, 4) });
+    });
+
+    // --- intro: the cup falls hard (its shadow grows under it), slams, splash
+    gsap.set(cupTurn, { transformOrigin: '50% 100%' });
+    intro.from(cupTurn, { yPercent: -135, duration: 0.55, ease: 'power4.in' }, landAt - 0.55)
+      .from(floorShadow, { scale: 0.25, opacity: 0, duration: 0.55, ease: 'power4.in' }, landAt - 0.55)
+      .add(function () { impact(1); splash(); }, landAt);
+    if (noteArrow) {
+      var arrowParts = noteArrow.querySelectorAll('path');
+      gsap.set(arrowParts, { strokeDasharray: 1, strokeDashoffset: 1 });
+      intro.to(arrowParts[0], { strokeDashoffset: 0, duration: 0.6, ease: 'power2.inOut' }, landAt + 0.7)
+        .to(arrowParts[1], { strokeDashoffset: 0, duration: 0.25, ease: 'power2.out' }, landAt + 1.25);
+    }
+
+    // --- click / tap the cup: it hops and slams again
+    var busy = false;
+    cup.classList.toggle('is-poppable', fine);
+    cup.addEventListener('click', function () {
+      if (busy) return; busy = true;
+      gsap.timeline({ onComplete: function () { busy = false; } })
+        .to(cupTurn, { scaleY: 0.92, scaleX: 1.05, duration: 0.08, ease: 'power2.out' })
+        .to(cupTurn, { yPercent: -14, scaleY: 1.04, scaleX: 0.97, duration: 0.22, ease: 'power2.out' }, '>')
+        .to(floorShadow, { scale: 0.8, opacity: 0.6, duration: 0.22, ease: 'power2.out' }, '<')
+        .to(cupTurn, { yPercent: 0, scaleY: 1, scaleX: 1, duration: 0.18, ease: 'power3.in' })
+        .to(floorShadow, { scale: 1, opacity: 1, duration: 0.18, ease: 'power3.in' }, '<')
+        .add(function () {
+          impact(0.7);
+          var ox = geo.cx, oy = geo.top + 0.45 * geo.h;
+          balls.forEach(function (b) {
+            if (!b.on) return;
+            var dx = b.hx - ox, dy = b.hy - oy, len = Math.hypot(dx, dy) || 1;
+            var push = rnd(70, 150) * (b.s[3] === 'f' ? 1.2 : 0.8);
+            gsap.timeline()
+              .to(b.k, { x: dx / len * push, y: dy / len * push - rnd(20, 60), rotation: rnd(-120, 120), duration: 0.28, ease: 'power3.out', overwrite: 'auto' })
+              .to(b.k, { x: 0, y: 0, rotation: 0, duration: 1.2, ease: 'elastic.out(1, 0.4)' });
+          });
+        })
+        .to({}, { duration: 1 });
+    });
+
+    // --- desktop: floating pieces dodge the cursor, the cup leans toward it
+    if (fine) {
+      gsap.set(cup, { transformPerspective: 1100 });
+      var tiltY = gsap.quickTo(cup, 'rotationY', { duration: 0.9, ease: 'power3' });
+      var tiltX = gsap.quickTo(cup, 'rotationX', { duration: 0.9, ease: 'power3' });
+      var R = 190;
+      var hero = document.getElementById('hero');
+      hero.addEventListener('pointermove', function (e) {
+        var r = scene.getBoundingClientRect();
+        var px2 = e.clientX - r.left, py2 = e.clientY - r.top;
+        balls.forEach(function (b) {
+          if (!b.on) return;
+          var dx = b.hx - px2, dy = b.hy - py2, d = Math.hypot(dx, dy) || 1;
+          var k = d < R ? Math.pow(1 - d / R, 2) * 110 : 0;
+          b.qx(dx / d * k); b.qy(dy / d * k);
+        });
+        var nx = Math.max(-1, Math.min(1, (px2 - geo.cx) / (r.width * 0.4)));
+        var ny = Math.max(-1, Math.min(1, (py2 - (geo.top + geo.h / 2)) / (r.height * 0.5)));
+        tiltY(nx * 10); tiltX(-ny * 5);
+      });
+      hero.addEventListener('pointerleave', function () {
+        balls.forEach(function (b) { b.qx(0); b.qy(0); });
+        tiltY(0); tiltX(0);
+      });
+    }
+
+    // --- script line: the three words hop one after another, now and then
+    var sw = document.querySelectorAll('.hero-script .sw');
+    if (sw.length) {
+      gsap.timeline({ repeat: -1, repeatDelay: 2.8, delay: landAt + 1.8 })
+        .to(sw, { y: -10, scale: 1.14, color: '#E9A15B', duration: 0.22, ease: 'power2.out', stagger: 0.2 })
+        .to(sw, { y: 0, scale: 1, color: '#7B4027', duration: 0.6, ease: 'bounce.out', stagger: 0.2 }, 0.22);
+    }
+
+    // --- pause the floating while the hero is off screen
+    ST.create({ trigger: '.hero', start: 'top bottom', end: 'bottom top',
+      onToggle: function (self) { floats.forEach(function (t) { if (self.isActive) t.resume(); else t.pause(); }); } });
+  }
+
+  /* ======================================================================
      GSAP: hero intro, reveals, parallax, edges
      ====================================================================== */
   function initMotion() {
@@ -669,7 +1324,6 @@
     var heroWords = document.querySelectorAll('.hero-title .w > span');
     var intro = gsap.timeline({ defaults: { ease: 'power4.out' }, delay: 0.1 });
     intro.from('.hero-plate', { scale: 1.08, duration: 2.2, ease: 'expo.out' }, 0)
-      .from('.hero-cup .cup-turn', { yPercent: 16, scale: 0.92, opacity: 0, duration: 1.4, ease: 'expo.out' }, 0.15)
       .from('.hero-copy .pill', { y: 20, opacity: 0, duration: 0.8 }, 0.2);
     if (heroWords.length) intro.from(heroWords, { yPercent: 115, duration: 1, stagger: 0.08 }, 0.3);
     intro.from('.hero-script', { y: 20, opacity: 0, rotate: -8, duration: 0.9 }, 0.65)
@@ -682,6 +1336,8 @@
       gsap.set(p, { strokeDasharray: len, strokeDashoffset: len });
       intro.to(p, { strokeDashoffset: 0, duration: 0.7, ease: 'power2.inOut' }, 1.4 + k * 0.15);
     });
+
+    heroPop(gsap, ST, intro, 0.85);
 
     // --- hero scroll: the plate drifts slower than the cup (depth)
     gsap.to('.hero-plate', { yPercent: 6, scale: 1.04, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });

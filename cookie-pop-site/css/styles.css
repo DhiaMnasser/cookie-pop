@@ -152,7 +152,9 @@ html[dir="rtl"] .btn:hover .btn-arrow { translate: -4px 0; }
   border-radius: 999px;
   box-shadow: 0 14px 40px -20px rgba(74, 36, 22, .45), inset 0 0 0 1.5px rgba(74, 36, 22, .08);
 }
-html[dir="rtl"] .header-bar { padding: 6px 18px 6px 8px; }
+/* the header keeps the same layout in every language: only the words change (each still reads in its own direction) */
+html[dir="rtl"] .header-bar { direction: ltr; }
+html[dir="rtl"] .nav-links a, html[dir="rtl"] .header-actions .btn { direction: rtl; }
 .brand { display: block; flex: none; transition: rotate .5s var(--bounce), scale .5s var(--bounce); }
 .brand:hover { rotate: -6deg; scale: 1.06; }
 .brand img { width: 74px; }
@@ -199,6 +201,8 @@ html[dir="rtl"] .header-bar { padding: 6px 18px 6px 8px; }
   .menu-btn { display: none; }
   .nav { display: flex; align-items: center; gap: clamp(10px, 1.6vw, 22px); }
   .nav-links { display: flex; gap: 2px; }
+  /* Arabic reads right to left: the links run from the right, the rest of the bar stays put */
+  html[dir="rtl"] .nav-links { flex-direction: row-reverse; }
   .header-actions { margin-inline-start: 0; }
 }
 
@@ -211,7 +215,6 @@ html[dir="rtl"] .header-bar { padding: 6px 18px 6px 8px; }
   width: 100%;
   min-height: min(100svh, 980px);
   overflow: hidden;
-  container-type: size;
 }
 .hero-plate { position: absolute; inset: 0; }
 .hero-plate img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 100%; }
@@ -236,7 +239,7 @@ html[dir="rtl"] .hero-scene::before { background: linear-gradient(-90deg, rgba(2
 .hero-script {
   position: relative; display: inline-block;
   font-size: clamp(1.7rem, 2.6vw, 2.5rem); line-height: 1.1;
-  margin: clamp(10px, 1.2vw, 16px) 0 clamp(18px, 2vw, 24px);
+  margin: clamp(28px, 3.4vw, 52px) 0 clamp(18px, 2vw, 24px);
   rotate: -3deg; transform-origin: left center;
 }
 .swoosh { display: block; width: 100%; height: 14px; margin-top: 2px; fill: none; stroke: var(--choc); stroke-width: 4; stroke-linecap: round; }
@@ -271,11 +274,51 @@ html[dir="rtl"] .hero-scene::before { background: linear-gradient(-90deg, rgba(2
   animation: shine 7s ease-in-out infinite;
 }
 @keyframes shine { 0%, 55% { background-position: 120% 0; } 85%, 100% { background-position: -20% 0; } }
-/* soft-focus balls in front of the scene, for depth */
-.hero-front { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
-.hf { position: absolute; translate: calc(var(--mx, 0) * var(--d, 0) * 1px) calc(var(--my, 0) * var(--d, 0) * 1px); animation: bob 7s ease-in-out infinite alternate; }
-.hf-1 { width: clamp(70px, 7vw, 120px); right: 6%; bottom: 8%; filter: blur(3px); --d: 1.4; }
-.hf-2 { width: clamp(46px, 4.4vw, 76px); left: 46%; top: 14%; filter: blur(2px); --d: 1.1; animation-delay: -3s; }
+/* "Pop!" — cookie balls and chocolate drops that splash out of the ground and float (built in main.js) */
+.pop-layer { position: absolute; inset: 0; pointer-events: none; }
+.pop-floor { z-index: 0; }
+.pop-back { z-index: 2; }
+.pop-front { z-index: 4; }
+.pb {
+  position: absolute; left: 0; top: 0;
+  width: var(--s, 60px); height: var(--s, 60px);
+  margin: calc(var(--s, 60px) / -2) 0 0 calc(var(--s, 60px) / -2);
+  translate: calc(var(--mx, 0) * var(--d, 0) * 1px) calc(var(--my, 0) * var(--d, 0) * 1px);
+}
+.pb-r, .pb-k { width: 100%; height: 100%; }
+.pb img { display: block; width: 100%; height: 100%; max-width: none; filter: drop-shadow(0 12px 10px rgba(110, 52, 20, .28)); user-select: none; }
+.pb-sh, .pop-ring, .pop-dust { position: absolute; left: 0; top: 0; translate: -50% -50%; border-radius: 50%; }
+.pb-sh { background: radial-gradient(closest-side, rgba(92, 42, 16, .42), rgba(92, 42, 16, 0)); }
+.pop-ring, .pop-dust { opacity: 0; }
+.pb-floor img { filter: none; }
+.cup-shadow { position: absolute; left: 0; top: 0; translate: -50% -50%; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(92, 42, 16, .5), rgba(92, 42, 16, .32) 55%, rgba(92, 42, 16, 0)); }
+.pop-bowl { position: absolute; left: 0; top: 0; translate: -50% 0; }
+.pop-bowl img { display: block; width: 100%; height: auto; max-width: none; transform-origin: 50% 80%; user-select: none; }
+.pop-drop { position: absolute; left: 0; top: 0; translate: -50% -50%; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; opacity: 0;
+  background: radial-gradient(circle at 35% 30%, #a0603a, #5a2a14 60%, #3d1a0b); }
+.pop-crumb { position: absolute; left: 0; top: 0; translate: -50% 0; border-radius: 40% 55% 45% 60%; background: #dca066; }
+.pop-crumb.is-dark { background: #b4743f; }
+.pop-ring { border: 3px solid rgba(74, 36, 22, .35); }
+.pop-dust { background: radial-gradient(closest-side, rgba(255, 236, 214, .9), rgba(255, 236, 214, 0)); }
+.pop-badge svg { display: block; width: 100%; height: 100%; overflow: visible; animation: badgespin 18s linear infinite; filter: drop-shadow(0 10px 14px rgba(110, 52, 20, .22)); }
+.pop-badge .bg { fill: var(--cream); }
+.pop-badge .ring { fill: none; stroke: var(--choc); stroke-width: 2; stroke-dasharray: 2 6; stroke-linecap: round; opacity: .5; }
+.pop-badge text { font-family: var(--display); font-weight: 800; font-size: 17px; letter-spacing: .14em; fill: var(--choc); }
+/* the ring turns anticlockwise in French / English, clockwise in Arabic (the way each script reads) */
+.pop-badge svg { animation-direction: reverse; }
+html[lang="ar"] .pop-badge svg { animation-direction: normal; }
+html[lang="ar"] .pop-badge text { font-size: 23px; letter-spacing: 0; }
+.pop-badge img { position: absolute; left: 27%; top: 27%; width: 46%; height: 46%; filter: drop-shadow(0 6px 6px rgba(110, 52, 20, .3)); }
+@keyframes badgespin { to { rotate: 360deg; } }
+.pop-word {
+  position: absolute; left: 0; top: 0; translate: -50% -50%;
+  font-family: "Fraunces", Georgia, serif; font-weight: 900; font-size: var(--fs, 64px); line-height: 1;
+  color: var(--pink); -webkit-text-stroke: 3px var(--choc); paint-order: stroke fill;
+  text-shadow: 4px 5px 0 var(--choc); letter-spacing: .02em; white-space: nowrap; opacity: 0;
+}
+.hero-cup.is-poppable { cursor: pointer; }
+.hero-script .sw { display: inline-block; transform-origin: 50% 100%; }
 .hero-cup picture { display: block; height: 100%; }
 .hero-cup img { height: 100%; width: 100%; max-width: none; object-fit: contain; }
 
@@ -283,6 +326,9 @@ html[dir="rtl"] .hero-scene::before { background: linear-gradient(-90deg, rgba(2
 .note svg { width: clamp(64px, 5.5vw, 92px); height: auto; fill: none; stroke: var(--choc); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; overflow: visible; }
 .note--dip { left: 76%; top: 22%; flex-direction: column; align-items: flex-end; text-align: end; max-width: 9em; }
 .note--dip svg { margin-inline-end: 40px; }
+/* placed by main.js next to the cup, with its arrow drawn to the lid */
+.note--dip.is-placed { left: 0; top: 0; right: auto; bottom: auto; align-items: center; text-align: center; }
+.note-arrow { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; fill: none; stroke: var(--choc); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
 
 .feats { display: flex; justify-content: center; flex-wrap: wrap; gap: clamp(14px, 3vw, 48px); margin-top: calc(-1 * clamp(28px, 3vw, 40px)); position: relative; z-index: 5; }
 .feat {
@@ -431,6 +477,13 @@ html[lang="ar"] .panel-title { line-height: 1.25; letter-spacing: 0; font-weight
 .rig-door { z-index: 3; }
 .rig-tray { width: 96cqw; aspect-ratio: 900 / 461; left: 2cqw; bottom: 28cqh; z-index: 2; }
 .rig-tray .tb { position: absolute; height: auto; will-change: transform, opacity; }
+/* the dough is tipped onto the tray as one mound; the balls roll out of it. Back rows pass behind it, front rows in front */
+.rig-tray .tb { z-index: 4; }
+.rig-tray .tb.is-back { z-index: 2; }
+.rig-tray .mound { position: absolute; left: 32%; top: 12%; width: 36%; height: auto; z-index: 3; will-change: transform, opacity; }
+.rig-tray .mound-sh, .rig-tray .tbs { position: absolute; border-radius: 50%; z-index: 1; will-change: transform, opacity;
+  background: radial-gradient(closest-side, rgba(70, 45, 25, .38), rgba(70, 45, 25, 0)); }
+.rig-tray .mound-sh { left: 28%; width: 44%; top: 54%; height: 14%; }
 .rig-cup  { height: 84cqh; aspect-ratio: 459 / 900; left: calc(50% - 84cqh * .51 / 2); bottom: 6cqh; z-index: 4; }
 .reveal-r {
   --r: -16;
@@ -438,37 +491,37 @@ html[lang="ar"] .panel-title { line-height: 1.25; letter-spacing: 0; font-weight
           mask-image: radial-gradient(circle at 52% 40%, #000 calc(var(--r) * 1%), transparent calc(var(--r) * 1% + 14%));
 }
 .reveal-c {
-  --a: -60;
-  -webkit-mask-image: conic-gradient(from -90deg at 51% 38%, #000 calc(var(--a) * 1deg), transparent calc(var(--a) * 1deg + 60deg));
-          mask-image: conic-gradient(from -90deg at 51% 38%, #000 calc(var(--a) * 1deg), transparent calc(var(--a) * 1deg + 60deg));
-}
-.rig-cup .fill {
-  --ct: 100;
+  /* the next batter is worked in where the whisk passes: soft blobs open along its path, grow and merge (no hard edge) */
+  --b0: -16; --b1: -16; --b2: -16; --b3: -16; --b4: -16; --b5: -16; --b6: -16; --bf: 0;
   -webkit-mask-image:
-    radial-gradient(circle closest-side, #000 90%, transparent 100%),
-    radial-gradient(circle closest-side, #000 90%, transparent 100%),
-    linear-gradient(to bottom, transparent calc(var(--ct) * .954% + 2.3%), #000 calc(var(--ct) * .954% + 2.4%));
+    radial-gradient(circle at 64.0% 34.0%, #000 calc(var(--b0) * 1%), transparent calc(var(--b0) * 1% + 16%)),
+    radial-gradient(circle at 59.5% 37.9%, #000 calc(var(--b1) * 1%), transparent calc(var(--b1) * 1% + 16%)),
+    radial-gradient(circle at 49.3% 38.9%, #000 calc(var(--b2) * 1%), transparent calc(var(--b2) * 1% + 16%)),
+    radial-gradient(circle at 41.2% 36.2%, #000 calc(var(--b3) * 1%), transparent calc(var(--b3) * 1% + 16%)),
+    radial-gradient(circle at 41.2% 31.8%, #000 calc(var(--b4) * 1%), transparent calc(var(--b4) * 1% + 16%)),
+    radial-gradient(circle at 49.3% 29.1%, #000 calc(var(--b5) * 1%), transparent calc(var(--b5) * 1% + 16%)),
+    radial-gradient(circle at 59.5% 30.1%, #000 calc(var(--b6) * 1%), transparent calc(var(--b6) * 1% + 16%)),
+    linear-gradient(rgba(0, 0, 0, var(--bf)), rgba(0, 0, 0, var(--bf)));
           mask-image:
-    radial-gradient(circle closest-side, #000 90%, transparent 100%),
-    radial-gradient(circle closest-side, #000 90%, transparent 100%),
-    linear-gradient(to bottom, transparent calc(var(--ct) * .954% + 2.3%), #000 calc(var(--ct) * .954% + 2.4%));
-  -webkit-mask-size: 11% 5.6%, 9% 4.6%, 100% 100%;
-          mask-size: 11% 5.6%, 9% 4.6%, 100% 100%;
-  -webkit-mask-repeat: repeat-x, repeat-x, no-repeat;
-          mask-repeat: repeat-x, repeat-x, no-repeat;
-  -webkit-mask-position: 3% calc(var(--ct) * 1% + 1%), 8% calc(var(--ct) * 1%), 0 0;
-          mask-position: 3% calc(var(--ct) * 1% + 1%), 8% calc(var(--ct) * 1%), 0 0;
+    radial-gradient(circle at 64.0% 34.0%, #000 calc(var(--b0) * 1%), transparent calc(var(--b0) * 1% + 16%)),
+    radial-gradient(circle at 59.5% 37.9%, #000 calc(var(--b1) * 1%), transparent calc(var(--b1) * 1% + 16%)),
+    radial-gradient(circle at 49.3% 38.9%, #000 calc(var(--b2) * 1%), transparent calc(var(--b2) * 1% + 16%)),
+    radial-gradient(circle at 41.2% 36.2%, #000 calc(var(--b3) * 1%), transparent calc(var(--b3) * 1% + 16%)),
+    radial-gradient(circle at 41.2% 31.8%, #000 calc(var(--b4) * 1%), transparent calc(var(--b4) * 1% + 16%)),
+    radial-gradient(circle at 49.3% 29.1%, #000 calc(var(--b5) * 1%), transparent calc(var(--b5) * 1% + 16%)),
+    radial-gradient(circle at 59.5% 30.1%, #000 calc(var(--b6) * 1%), transparent calc(var(--b6) * 1% + 16%)),
+    linear-gradient(rgba(0, 0, 0, var(--bf)), rgba(0, 0, 0, var(--bf)));
 }
-.rig-cup .ins-l { --fl: 41; clip-path: inset(calc(var(--fl) * 1%) 48.4% 0 0); }
-.rig-cup .ins-r { --fr: 41; clip-path: inset(calc(var(--fr) * 1%) 0 0 51.6%); }
-.pour {
-  position: absolute; top: -45%; height: 62%; width: 3.2%;
-  border-radius: 0 0 40px 40px; transform-origin: 50% 0; opacity: 0;
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 22%);
-          mask-image: linear-gradient(to bottom, transparent, #000 22%);
-}
-.pour-l { left: 27.8%; background: linear-gradient(90deg, #3e1c0d, #9a5a33 40%, #6b351a 60%, #42200f); }
-.pour-r { left: 71.6%; background: linear-gradient(90deg, #cdb894, #fffaf0 40%, #efe2c8 60%, #d3bf9b); }
+/* the dips: a live, wobbling stream and a rising surface, drawn by main.js */
+.rig-cup .ins-l { clip-path: inset(41% 48.4% 0 0); }
+.rig-cup .ins-r { clip-path: inset(41% 0 0 51.6%); }
+.rig-cup .liq { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.liq .pour { opacity: 0; }
+.rig-cup .ins-l, .rig-cup .ins-r { clip-path: inset(100% 0 0 0); }   /* revealed by main.js as the sauce rises */
+.liq .gloss { fill: rgba(255, 255, 255, .38); }
+.liq .rip { fill: none; vector-effect: non-scaling-stroke; stroke-width: 1.6; }
+.pour-l .rip { stroke: rgba(190, 130, 85, .9); }
+.pour-r .rip { stroke: rgba(255, 255, 250, .95); }
 .oven-light {
   position: absolute; left: 22.4%; top: 26.4%; width: 54.9%; height: 26.4%;
   border-radius: 10px; mix-blend-mode: screen; pointer-events: none; opacity: 0;
@@ -481,20 +534,47 @@ html[lang="ar"] .panel-title { line-height: 1.25; letter-spacing: 0; font-weight
   opacity: 0;
 }
 .steam {
-  position: absolute; top: 30%; width: 16%; aspect-ratio: 1 / 2.2; border-radius: 50%;
+  position: absolute; top: 30%; width: 12%; aspect-ratio: 1 / 2.2; border-radius: 50%;
   background: radial-gradient(closest-side, rgba(255, 246, 234, .6), rgba(255, 246, 234, 0));
   filter: blur(6px); opacity: 0;
 }
+/* steam rising off the cookies while they bake: it loops on its own (not with the scroll); the story fades it in and out */
+.bake-steam { position: absolute; inset: 0; pointer-events: none; opacity: 0; }
+.bake-steam .wisp {
+  position: absolute; width: 3%; height: 16%; translate: -50% 0; overflow: visible;
+  fill: none; stroke: rgba(255, 248, 238, .95); stroke-width: 6.5; stroke-linecap: round;
+  filter: blur(1.8px) drop-shadow(0 0 3px rgba(255, 240, 220, .5));
+  -webkit-mask-image: linear-gradient(to top, transparent 0%, #000 22%, #000 55%, transparent 100%);
+          mask-image: linear-gradient(to top, transparent 0%, #000 22%, #000 55%, transparent 100%);
+  transform-origin: 50% 100%;
+  animation: wisp 3.6s ease-in-out infinite;
+}
+@keyframes wisp {
+  0%   { opacity: 0;   transform: translateY(18%) scaleY(.55) scaleX(.8) skewX(0deg); }
+  20%  { opacity: .9; }
+  50%  { transform: translateY(-14%) scaleY(1) scaleX(1.15) skewX(-7deg); }
+  75%  { opacity: .45; }
+  100% { opacity: 0;   transform: translateY(-46%) scaleY(1.25) scaleX(1.5) skewX(6deg); }
+}
+.bake-steam .wisp:nth-child(even) { animation-name: wisp-b; }
+@keyframes wisp-b {
+  0%   { opacity: 0;   transform: translateY(18%) scaleY(.5) scaleX(-.8) skewX(0deg); }
+  25%  { opacity: .85; }
+  55%  { transform: translateY(-12%) scaleY(1) scaleX(-1.1) skewX(8deg); }
+  80%  { opacity: .4; }
+  100% { opacity: 0;   transform: translateY(-48%) scaleY(1.3) scaleX(-1.45) skewX(-5deg); }
+}
 .steam.s1 { left: 26%; } .steam.s2 { left: 44%; } .steam.s3 { left: 62%; }
 .grains, .chips, .balls { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
-.balls { z-index: 3; }
+.rig-cup .balls { z-index: 0; }   /* inside the cup: over its glass, under the dip insert and the lid (its own layer stack) */
 .flour, .whisk { position: absolute; left: 0; top: 0; z-index: 5; opacity: 0; will-change: transform, opacity; pointer-events: none; }
 .flour { width: 62cqw; }
 .whisk { width: 54cqw; filter: drop-shadow(0 10px 14px rgba(43, 15, 5, .22)); }
 .grains i, .chips img, .balls img { position: absolute; left: 0; top: 0; opacity: 0; will-change: transform, opacity; }
 .grains i { width: 1.1cqw; aspect-ratio: 1; border-radius: 30%; background: #fffdf8; box-shadow: 0 0 0 .5px rgba(120, 90, 60, .25); }
 .chips img { width: 6cqw; }
-.balls img { width: 9.5cqw; filter: drop-shadow(0 6px 6px rgba(43, 15, 5, .22)); }
+.balls img { width: 20%; filter: drop-shadow(0 4px 4px rgba(43, 15, 5, .22)); }
+.balls img.is-back { filter: brightness(.78) drop-shadow(0 3px 3px rgba(43, 15, 5, .2)); }
 .burst { position: absolute; width: 70cqw; left: 15cqw; top: 26cqh; fill: none; stroke: var(--choc); stroke-width: 7; stroke-linecap: round; opacity: 0; }
 
 /* chapter nav: pill chips */
@@ -689,7 +769,8 @@ html[lang="ar"] .tab { letter-spacing: 0; font-size: 13px; }
 [hidden] { display: none !important; }
 
 @media (prefers-reduced-motion: reduce) {
-  .cup-turn, .cup-shine, .hf { animation: none !important; }
+  .cup-turn, .cup-shine { animation: none !important; }
+  .bake-steam { display: none; }
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
   .marquee-track { flex-wrap: wrap; width: auto; justify-content: center; }
   .marquee-group + .marquee-group { display: none; }
