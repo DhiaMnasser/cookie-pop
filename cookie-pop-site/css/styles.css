@@ -801,7 +801,7 @@ html[lang="ar"] .tab { letter-spacing: 0; font-size: 13px; }
   .lineup img { height: auto; aspect-ratio: 6 / 5; object-fit: cover; object-position: 50% 50%; }
   .lineup-tags { position: relative; inset: auto; height: 84px; }
   .tag { bottom: 14px; }
-  .tag--s { left: 17%; } .tag--m { left: 48%; } .tag--l { left: 80%; }
+  .tag--s { left: 15%; } .tag--m { left: 48%; } .tag--l { left: 82%; }
   .badge { font-size: 12px; padding: 4px 10px; }
 }
 
