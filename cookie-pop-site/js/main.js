@@ -1371,8 +1371,18 @@
         var col = '';
         for (var i = 0; i <= 10 + +d; i++) col += '<span>' + (i % 10) + '</span>';
         return '<span class="dg"><span>' + col + '</span></span>';
-      }).join('') + suffix;
+      }).join('') + (suffix ? '<span class="num-suf">' + suffix + '</span>' : '');
       el.setAttribute('aria-label', target + suffix);
+      // each column is as wide as its final digit (tabular digits left a gap after a narrow "1")
+      el.querySelectorAll('.dg').forEach(function (dg, k) {
+        var probe = document.createElement('span');
+        probe.textContent = target.charAt(k);
+        probe.style.cssText = 'position:absolute;visibility:hidden;font-variant-numeric:proportional-nums';
+        el.appendChild(probe);
+        var fs = parseFloat(getComputedStyle(el).fontSize) || 1;
+        dg.style.width = (probe.getBoundingClientRect().width / fs) + 'em';
+        el.removeChild(probe);
+      });
       var cols = el.querySelectorAll('.dg > span');
       gsap.set(cols, { yPercent: 0 });
       cols.forEach(function (c, k) {

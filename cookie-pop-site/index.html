@@ -37,7 +37,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,500..800,100,1;1,9..144,500..700,100,1&family=Nunito:wght@400;600;700;800;900&family=Kalam:wght@700&family=Baloo+Bhaijaan+2:wght@500;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
 
-  <link rel="stylesheet" href="css/styles.css?v=112">
+  <link rel="stylesheet" href="css/styles.css?v=115">
 
   <script>
     /* Motion gate before first paint; main.js removes .js-anim if GSAP fails to load. */
@@ -68,7 +68,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
   <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js" defer></script>
-  <script src="js/main.js?v=134" defer></script>
+  <script src="js/main.js?v=135" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main" data-i18n="a11y.skip">Aller au contenu</a>
@@ -112,6 +112,16 @@
         <picture class="hero-plate" aria-hidden="true">
           <source srcset="assets/poster/hero-plate.webp?v=3" type="image/webp">
           <img src="assets/poster/hero-plate.jpg?v=3" width="1376" height="768" alt="" fetchpriority="high" decoding="async">
+        </picture>
+
+        <!-- melted chocolate dripping from the top corners -->
+        <picture class="hero-drip hero-drip--l" aria-hidden="true">
+          <source srcset="assets/transparent/hero/drip-tl.webp" type="image/webp">
+          <img src="assets/transparent/hero/drip-tl.png" width="406" height="217" alt="" decoding="async">
+        </picture>
+        <picture class="hero-drip hero-drip--r" aria-hidden="true">
+          <source srcset="assets/transparent/hero/drip-tr.webp" type="image/webp">
+          <img src="assets/transparent/hero/drip-tr.png" width="496" height="164" alt="" decoding="async">
         </picture>
 
         <div class="hero-copy">
@@ -382,8 +392,8 @@
       <div class="wrap">
         <figure class="lineup" data-reveal>
           <picture>
-            <source srcset="assets/poster/lineup.webp" type="image/webp">
-            <img src="assets/poster/lineup.jpg" width="1264" height="843" loading="lazy" decoding="async" data-i18n-attr="alt:alt.lineup"
+            <source srcset="assets/poster/lineup.webp?v=2" type="image/webp">
+            <img src="assets/poster/lineup.jpg?v=2" width="1536" height="1024" loading="lazy" decoding="async" data-i18n-attr="alt:alt.lineup"
                  alt="Les trois gobelets Cookie POP, petit, moyen et grand, remplis de mini boules de cookie avec le double dip chocolat">
           </picture>
           <figcaption class="lineup-tags">
@@ -427,8 +437,8 @@
       <div class="wrap">
         <figure class="lineup lineup--color" data-reveal>
           <picture>
-            <source srcset="assets/poster/lineup-colored.webp" type="image/webp">
-            <img src="assets/poster/lineup-colored.jpg" width="1264" height="843" loading="lazy" decoding="async" data-i18n-attr="alt:alt.lineupColor"
+            <source srcset="assets/poster/lineup-colored.webp?v=2" type="image/webp">
+            <img src="assets/poster/lineup-colored.jpg?v=2" width="1535" height="1024" loading="lazy" decoding="async" data-i18n-attr="alt:alt.lineupColor"
                  alt="Gobelets Cookie POP remplis de mini boules de cookie classique, cacao, fraise et pistache, avec le double dip chocolat">
           </picture>
         </figure>

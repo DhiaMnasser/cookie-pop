@@ -777,3 +777,55 @@ html[lang="ar"] .tab { letter-spacing: 0; font-size: 13px; }
   .marquee-group { white-space: normal; flex-wrap: wrap; justify-content: center; }
   .site-header.is-hidden { transform: none; }
 }
+
+/* =========================================================================
+   Responsive polish (phones / tablets)
+   ========================================================================= */
+/* stats: each rolling digit column takes its final digit's own width (no "1 00%" gap), smaller % sign */
+.num-val .dg > span > span { text-align: center; }
+.num-suf { font-size: .72em; line-height: 1; padding-bottom: .05em; }
+@media (max-width: 599.98px) {
+  .num { padding: 18px 16px; }
+  .num-val { font-size: clamp(2.5rem, 11.5vw, 3.2rem); }
+}
+
+/* story on phones: a bigger product window closer to the copy, and step tabs you can actually tap
+   (8px bar, 28px touch area) */
+@media (max-width: 919.98px) {
+  .js-anim .stage { --h: min(calc(100svh - 340px), 112vw, 560px); }
+  .js-anim .story-tabs { top: 82px; }
+  .tab { height: 28px; min-height: 28px; padding: 0; overflow: visible; background: transparent !important; box-shadow: none !important; }
+  .tab::before { content: ""; position: absolute; inset: 10px 0; border-radius: 999px; background: rgba(255, 255, 255, .5); transition: background-color .3s ease; }
+  .story-pin[data-tone="choc"] .tab::before { background: rgba(255, 248, 241, .12); }
+  .tab[aria-current="step"]::before { background: var(--card); box-shadow: 0 6px 16px -10px rgba(74, 36, 22, .5); }
+  .tab-fill { top: 10px; bottom: 10px; border-radius: 999px; }
+}
+@media (min-width: 600px) and (max-width: 919.98px) { .js-anim .stage { --h: min(58svh, 92vw); } }
+
+/* line-up photos on phones: crop to the cups so they read bigger; size tags sit in a band under the photo */
+@media (max-width: 640px) {
+  .lineup img { height: auto; aspect-ratio: 6 / 5; object-fit: cover; object-position: 50% 50%; }
+  .lineup-tags { position: relative; inset: auto; height: 84px; }
+  .tag { bottom: 14px; }
+  .tag--s { left: 17%; } .tag--m { left: 48%; } .tag--l { left: 80%; }
+  .badge { font-size: 12px; padding: 4px 10px; }
+}
+
+/* order: keep the floating cookies clear of the text on phones */
+@media (max-width: 599.98px) {
+  .ob-1 { left: 3%; top: 5%; width: 64px; }
+  .ob-2 { right: 3%; top: 9%; width: 54px; }
+  .ob-3 { display: none; }
+}
+
+/* melted chocolate in the hero's top corners: over the photo and its fade, under the copy and the cup */
+.hero-drip { position: absolute; top: 0; z-index: 2; pointer-events: none; transform-origin: 50% 0; animation: drip-in 1.4s cubic-bezier(.2, .9, .25, 1) .2s both; }
+.hero-drip img { width: 100%; height: auto; filter: drop-shadow(0 10px 14px rgba(74, 36, 22, .22)); }
+.hero-drip--l { left: 0; width: clamp(170px, 22vw, 400px); }
+.hero-drip--r { right: 0; width: clamp(200px, 26vw, 480px); animation-delay: .35s; }
+@keyframes drip-in { from { transform: translateY(-38%) scaleY(.55); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (max-width: 919.98px) {
+  .hero-drip--l { width: clamp(190px, 54vw, 340px); }
+  .hero-drip--r { width: clamp(220px, 68vw, 420px); }
+}
+@media (prefers-reduced-motion: reduce) { .hero-drip { animation: none; } }
