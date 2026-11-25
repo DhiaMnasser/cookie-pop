@@ -829,3 +829,11 @@ html[lang="ar"] .tab { letter-spacing: 0; font-size: 13px; }
   .hero-drip--r { width: clamp(220px, 68vw, 420px); }
 }
 @media (prefers-reduced-motion: reduce) { .hero-drip { animation: none; } }
+
+/* phones / tablets: the cup comes first, so its pop-in intro is the first thing you see;
+   the headline sits right under it, inviting the scroll. The peach fade moves under the text. */
+@media (max-width: 919.98px) {
+  .hero-cup { order: -1; height: min(calc(100svh - 250px), 128vw, 580px); min-height: 340px; margin: 92px 0 6px; }
+  .hero-copy { order: 0; padding-top: 8px; padding-bottom: clamp(64px, 14vw, 90px); }
+  .hero-scene::before { background: linear-gradient(0deg, rgba(248, 206, 166, .94) 0%, rgba(248, 206, 166, .8) 40%, rgba(248, 206, 166, 0) 64%); }
+}
