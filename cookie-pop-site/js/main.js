@@ -878,7 +878,7 @@
   }
 
   /* ======================================================================
-     Hero "Pop!" — every ingredient is a real object. The cup slams onto the
+     Hero — every ingredient is a real object. The cup slams onto the
      floor and a shockwave runs out from it: the pieces round the landing
      spot splash up and keep floating; the cookies, chips, crumbs and the dip
      bowl further out jump (the closer, the higher) and settle again.
@@ -1001,7 +1001,6 @@
     if (document.fonts && document.fonts.load) document.fonts.load('800 23px "Baloo Bhaijaan 2"', 'غمّس').then(badgeText, function () {});
     if (document.fonts && document.fonts.addEventListener) document.fonts.addEventListener('loadingdone', badgeText);
     new MutationObserver(badgeText).observe(root, { attributes: true, attributeFilter: ['lang'] });
-    var word = mk('span', 'pop-word', front);
     // "Double chocolate dip": the note sits beside the cup's top and its arrow is drawn to the lid, in every layout
     var note = scene.querySelector('.note--dip'), noteArrow = null;
     if (note) {
@@ -1012,7 +1011,6 @@
       front.appendChild(noteArrow);
       note.classList.add('is-placed');
     }
-    word.textContent = 'POP!';
     var rings = [0, 1].map(function () { return mk('span', 'pop-ring', ground); });
     var dust = mk('span', 'pop-dust', ground);
     // rings and dust lie on the floor, under everything else in the layer
@@ -1077,7 +1075,6 @@
       badge.gx = X(-0.12); badge.gy = geo.top + 1.03 * H - bs * 0.23;   // where its cookie lies before the slam
       px(badge, badge.bx, badge.by);
       badge.style.setProperty('--s', bs.toFixed(1) + 'px');
-      px(word, X(-0.3), geo.top + 0.04 * H); word.style.setProperty('--fs', (0.1 * H).toFixed(1) + 'px');
       if (note) placeNote(W, SH, H);
       rings.concat(dust).forEach(function (e) {
         px(e, geo.cx, geo.base); e.style.width = (0.62 * H).toFixed(1) + 'px'; e.style.height = (0.13 * H).toFixed(1) + 'px';
@@ -1217,15 +1214,6 @@
       floor.forEach(function (o) { hop(o, power, false); });
       crumbs.forEach(function (c) { hop(c, power, true); });
       bowlHop(power);
-      popWord();
-    }
-
-    function popWord() {
-      gsap.killTweensOf(word);
-      gsap.timeline()
-        .fromTo(word, { opacity: 1, scale: 0.2, rotation: geo.dir * -24, y: 10 },
-                      { scale: 1, rotation: geo.dir * -8, y: 0, duration: 0.45, ease: 'back.out(3)' })
-        .to(word, { opacity: 0, y: -36, scale: 1.1, duration: 0.45, ease: 'power2.in' }, 0.75);
     }
 
     // --- the floating pieces keep floating, each at its own pace

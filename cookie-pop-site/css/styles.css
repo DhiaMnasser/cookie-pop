@@ -311,12 +311,6 @@ html[lang="ar"] .pop-badge svg { animation-direction: normal; }
 html[lang="ar"] .pop-badge text { font-size: 23px; letter-spacing: 0; }
 .pop-badge img { position: absolute; left: 27%; top: 27%; width: 46%; height: 46%; filter: drop-shadow(0 6px 6px rgba(110, 52, 20, .3)); }
 @keyframes badgespin { to { rotate: 360deg; } }
-.pop-word {
-  position: absolute; left: 0; top: 0; translate: -50% -50%;
-  font-family: "Fraunces", Georgia, serif; font-weight: 900; font-size: var(--fs, 64px); line-height: 1;
-  color: var(--pink); -webkit-text-stroke: 3px var(--choc); paint-order: stroke fill;
-  text-shadow: 4px 5px 0 var(--choc); letter-spacing: .02em; white-space: nowrap; opacity: 0;
-}
 .hero-cup.is-poppable { cursor: pointer; }
 .hero-script .sw { display: inline-block; transform-origin: 50% 100%; }
 .hero-cup picture { display: block; height: 100%; }
